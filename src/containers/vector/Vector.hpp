@@ -43,12 +43,8 @@ namespace ft
 template < class T, class Alloc = allocator<T> >
 class vector
 {
-	private:
-		value_type		*_v;
-		size_type		_capacity;
-		size_type		_size;
-		allocator_type	_alloc;
 
+	/* ============================== MEMBER TYPE ============================== */
 	public:
 		/* The first template parameter (T) */
 		typedef T											value_type;
@@ -65,11 +61,25 @@ class vector
 		typedef typename allocator_type::difference_type	difference_type;
 
 		/* an unsigned integral type that can represent any non-negative value of difference_type */
-		typedef typename allocator_type::size_type	size_type;
+		typedef typename allocator_type::size_type			size_type;
 
 
 	/* ============================== CONSTRUCTORS/DESTRUCTOR ============================== */
+	public:
+		explicit vector (const allocator_type& alloc = allocator_type());
+		explicit vector (size_type n, const value_type& val = value_type(),
+                 const allocator_type& alloc = allocator_type());
+		template <class InputIterator>
+         vector (InputIterator first, InputIterator last,
+                 const allocator_type& alloc = allocator_type());
+		vector (const vector& x);
 	
+	/* ============================== MEMBER ATTRIBUTES ============================== */
+	private:
+		value_type		*_v;
+		size_type		_capacity;
+		size_type		_size;
+		allocator_type	_alloc;
 };
 
 };
