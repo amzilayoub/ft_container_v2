@@ -43,6 +43,12 @@ namespace ft
 template < class T, class Alloc = allocator<T> >
 class vector
 {
+	/* ============================== MEMBER ATTRIBUTES ============================== */
+	private:
+		value_type		*_v;
+		size_type		_capacity;
+		size_type		_size;
+		allocator_type	_alloc;
 
 	/* ============================== MEMBER TYPE ============================== */
 	public:
@@ -74,12 +80,6 @@ class vector
                  const allocator_type& alloc = allocator_type());
 		vector (const vector& x);
 	
-	/* ============================== MEMBER ATTRIBUTES ============================== */
-	private:
-		value_type		*_v;
-		size_type		_capacity;
-		size_type		_size;
-		allocator_type	_alloc;
 };
 
 };
