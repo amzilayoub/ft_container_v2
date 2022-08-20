@@ -21,15 +21,15 @@
 namespace ft
 {
 
-template <class T>
+template <class iterator>
 struct iterator_traits {
 
 	/* ============================== MEMBER TYPE ============================== */
-	typedef typename T::value_type			value_type;
-	typedef typename T::difference_type		difference_type;
-	typedef typename T::iterator_category	iterator_category;
-	typedef typename T::pointer				pointer;
-	typedef typename T::reference			reference;
+	typedef typename iterator::value_type			value_type;
+	typedef typename iterator::difference_type		difference_type;
+	typedef typename iterator::iterator_category	iterator_category;
+	typedef typename iterator::pointer				pointer;
+	typedef typename iterator::reference			reference;
 };
 
 };

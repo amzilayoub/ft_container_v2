@@ -27,19 +27,23 @@
 namespace ft
 {
 
-template<typename CATEGORY, typename T>
-class Iterator
+template <
+		class Category,              // iterator::iterator_category
+        class T,                     // iterator::value_type
+        class Distance = ptrdiff_t,  // iterator::difference_type
+        class Pointer = T*,          // iterator::pointer
+        class Reference = T&         // iterator::reference
+        >
+class iterator
 {
 
 	/* ============================== MEMBER TYPE ============================== */
-	public:
-		typedef typename CATEGORY					iterator_category; 
-		typedef typename std::ptrdiff_t				difference_type;
-		typedef T									value_type;
-		typedef value_type							*pointer;
-		typedef value_type							&reference;
-
-};
+    typedef T         value_type;
+    typedef Distance  difference_type;
+    typedef Pointer   pointer;
+    typedef Reference reference;
+    typedef Category  iterator_category;
+  };
 
 
 };

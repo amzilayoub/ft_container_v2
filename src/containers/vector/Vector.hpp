@@ -63,6 +63,9 @@ class vector
 		typedef typename allocator_type::pointer			pointer;
 		typedef typename allocator_type::const_pointer		const_pointer;
 
+		/* a random access iterator to value_type */
+		
+
 		/* a signed integral type, identical to: ptrdiff_t */
 		typedef typename allocator_type::difference_type	difference_type;
 
