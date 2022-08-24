@@ -1,2 +1,2 @@
 all:
-	clang++ -fstanitize=address -std=c++98 src/**/**.cpp
+	clang++ -fsanitize=address -std=c++98 main.cpp

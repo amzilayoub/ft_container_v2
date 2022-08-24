@@ -20,10 +20,20 @@ namespace ft
 template <typename T>
 class random_access_iterator : public ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >
 {
+    
+
+    /* ============================== MEMBER TYPE ============================== */
+    public:
+        typedef typename ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >::value_type value_type;
+        typedef typename ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >::difference_type difference_type;
+        typedef typename ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >::pointer pointer;
+        typedef typename ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >::reference reference;
+        typedef typename ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >::iterator_category iterator_category;
+
     /* ============================== MEMBER ATTRIBUTES ============================== */
     private:
         value_type *_iter;
-    
+
     /* ============================== CONSTRUCTOR/DESTRUCTOR ============================== */
     public:
         random_access_iterator(pointer ptr = nullptr) : _iter(ptr)
@@ -54,13 +64,6 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
         pointer operator->(void) const
         {
             return (*this->operator*());
-        }
-
-        random_access_iterator &operator++(void)
-        {
-            ++this->_iter;
-
-            return (*this);
         }
 
         random_access_iterator &operator++(void)
