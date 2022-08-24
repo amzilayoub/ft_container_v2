@@ -24,6 +24,8 @@
 
 # pragma once
 
+# include "../plateform_base.hpp"
+
 namespace ft
 {
 
