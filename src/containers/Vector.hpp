@@ -141,12 +141,165 @@ class vector
 				(*this) = x;
 		}
 
-		/* ============================== MEMBER ATTRIBUTES ============================== */
+		/*
+		** This destroys all container elements, and deallocates
+		** all the storage capacity allocated by the vector using its allocator.
+		** @param void void
+		** @return none
+		*/
+		~vector(void)
+		{
+			this->_alloc.deallocate(this->_v, this->_capacity);
+		}
+
+		/* ============================== MEMBER FUNCTIONS ============================== */
+		/* =================== */
+		/* ==== ITERATORS ==== */
+		/* =================== */
+		/*
+		** Return iterator to beginning
+		** Returns an iterator pointing to the first element in the vector.
+		** Notice that, unlike member vector::front,
+		** which returns a reference to the first element,
+		** this function returns a random access iterator pointing to it.
+		** If the container is empty,
+		** the returned iterator value shall not be dereferenced.
+		** @param none none
+		** @return An iterator to the beginning of the sequence container.
+		*/
+		iterator begin()
+		{
+			return (iterator(this->_v));
+		}
+
+		/*
+		** Return iterator to beginning
+		** Returns an iterator pointing to the first element in the vector.
+		** Notice that, unlike member vector::front,
+		** which returns a reference to the first element,
+		** this function returns a random access iterator pointing to it.
+		** If the container is empty,
+		** the returned iterator value shall not be dereferenced.
+		** @param none none
+		** @return An iterator to the beginning of the sequence container.
+		*/
+		const_iterator begin() const
+		{
+			return (const_iterator(this->_v));
+		}
+
+		/*
+		** Returns an iterator referring to the past-the-end element in the vector container.
+		** The past-the-end element is the theoretical element
+		** that would follow the last element in the vector.
+		** It does not point to any element, and thus shall not be dereferenced.
+		** Because the ranges used by functions of the standard
+		** library do not include the element pointed by their
+		** closing iterator, this function is often used in
+		** combination with vector::begin to specify a range
+		** including all the elements in the container.
+		** If the container is empty, this function returns
+		** the same as vector::begin.
+		** @param void void
+		** @return An iterator to the element past the end of the sequence.
+		*/
+		iterator end()
+		{
+			return (iterator(&this->_v[this->size()]));
+		}
+
+		/*
+		** Returns an iterator referring to the past-the-end element in the vector container.
+		** The past-the-end element is the theoretical element
+		** that would follow the last element in the vector.
+		** It does not point to any element, and thus shall not be dereferenced.
+		** Because the ranges used by functions of the standard
+		** library do not include the element pointed by their
+		** closing iterator, this function is often used in
+		** combination with vector::begin to specify a range
+		** including all the elements in the container.
+		** If the container is empty, this function returns
+		** the same as vector::begin.
+		** @param void void
+		** @return An iterator to the element past the end of the sequence.
+		*/
+		const_iterator end() const
+		{
+			return (const_iterator(&this->_v[this->size()]));
+		}
+
+		/*
+		** Return reverse iterator to reverse beginning
+		** Returns a reverse iterator pointing to the last
+		** element in the vector (i.e., its reverse beginning).
+		** Reverse iterators iterate backwards: increasing them moves
+		** them towards the beginning of the container.
+		** rbegin points to the element right before the one that would
+		** be pointed to by member end.
+		** Notice that unlike member vector::back, which returns a reference
+		** to this same element, this function returns a reverse random access iterator.
+		** @param void void
+		** @return A reverse iterator to the reverse beginning of the sequence container.
+		*/
+		reverse_iterator rbegin()
+		{
+			return (reverse_iterator(this->end()));
+		}
+
+		/*
+		** Return reverse iterator to reverse beginning
+		** Returns a reverse iterator pointing to the last
+		** element in the vector (i.e., its reverse beginning).
+		** Reverse iterators iterate backwards: increasing them moves
+		** them towards the beginning of the container.
+		** rbegin points to the element right before the one that would
+		** be pointed to by member end.
+		** Notice that unlike member vector::back, which returns a reference
+		** to this same element, this function returns a reverse random access iterator.
+		** @param void void
+		** @return A reverse iterator to the reverse beginning of the sequence container.
+		*/
+		const_reverse_iterator rbegin() const
+		{
+			return (const_reverse_iterator(this->end()));
+		}
+
+		/*
+		** Return reverse iterator to reverse end
+		** Returns a reverse iterator pointing to the theoretical element
+		** preceding the first element in the vector (which is considered its reverse end).
+		** The range between vector::rbegin and vector::rend contains all
+		** the elements of the vector (in reverse order).
+		** @param void void
+		** @return A reverse iterator to the reverse end of the sequence container.
+		*/
+		reverse_iterator rend()
+		{
+			return (reverse_iterator(this->begin()));
+		}
+
+		/*
+		** Return reverse iterator to reverse end
+		** Returns a reverse iterator pointing to the theoretical element
+		** preceding the first element in the vector (which is considered its reverse end).
+		** The range between vector::rbegin and vector::rend contains all
+		** the elements of the vector (in reverse order).
+		** @param void void
+		** @return A reverse iterator to the reverse end of the sequence container.
+		*/
+		const_reverse_iterator rend() const
+		{
+			return (const_reverse_iterator(this->begin()));
+		}
+
+		/* ================== */
+		/* ==== CAPACITY ==== */
+		/* ================== */
 		/*
 		** Returns the number of elements in the vector.
 		** This is the number of actual objects held in the vector,
 		** which is not necessarily equal to its storage capacity.
-		** @param none none
+		** @param void void
 		** @return The number of elements in the container.
 		*/
 		size_type size() const
@@ -181,7 +334,42 @@ class vector
 		{
 			return (this->_alloc);
 		}
-	
+
+		/*
+		** Access element
+		** Returns a reference to the element at position n in the vector container.
+		** A similar member function, vector::at,
+		** has the same behavior as this operator function,
+		** except that vector::at is bound-checked and signals if the requested position
+		** is out of range by throwing an out_of_range exception.
+		** Portable programs should never call this function with an argument n
+		** that is out of range, since this causes undefined behavior.
+		** @param n Position of an element in the container.
+		** @return The element at the specified position in the vector.
+		*/
+		reference operator[] (size_type n)
+		{
+			return (this->_v[n]);
+		}
+
+		/*
+		** Access element
+		** Returns a reference to the element at position n in the vector container.
+		** A similar member function, vector::at,
+		** has the same behavior as this operator function,
+		** except that vector::at is bound-checked and signals if the requested position
+		** is out of range by throwing an out_of_range exception.
+		** Portable programs should never call this function with an argument n
+		** that is out of range, since this causes undefined behavior.
+		** @param n Position of an element in the container.
+		** @return The element at the specified position in the vector.
+		*/
+		const_reference operator[] (size_type n) const
+		{
+			return (this->_v[n]);
+		}
+
+
 		/* ============================== OPERATORS ============================== */
 		/*
 		** Assigns new contents to the container,
