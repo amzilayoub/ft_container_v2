@@ -38,6 +38,8 @@
 # include <memory>
 # include "../Utility/Iterators/random_access_iterator.hpp"
 # include "../Utility/Iterators/reverse_iterator.hpp"
+# include <stdexcept>
+# define __VECTOR_GROWTH_SIZE__ 2
 
 namespace ft
 {
@@ -88,7 +90,7 @@ class vector
 		** @param alloc Allocator object.
 		** @return none none
 		*/
-		explicit vector (const allocator_type& alloc = allocator_type())
+		explicit vector(const allocator_type& alloc = allocator_type())
 		: _v(nullptr), _capacity(0), _size(0), _alloc(alloc)
 		{
 		}
@@ -101,7 +103,7 @@ class vector
 		** @param alloc Allocator object.
 		** @return none none
 		*/
-		explicit vector (size_type n, const value_type& val = value_type(),
+		explicit vector(size_type n, const value_type& val = value_type(),
             const allocator_type& alloc = allocator_type())
 		: _capacity(n), _size(n), _alloc(alloc)
 		{
@@ -121,7 +123,7 @@ class vector
 		** @return none none
 		*/
 		template <class InputIterator>
-        vector (InputIterator first, InputIterator last,
+        vector(InputIterator first, InputIterator last,
             const allocator_type& alloc = allocator_type())
 		: _alloc(alloc)
 		{
@@ -135,10 +137,9 @@ class vector
 			}
 		}
 
-		vector (const vector& x) : _alloc(x.get_allocator())
+		vector(const vector& x) : _alloc(x.get_allocator())
 		{
-			if (this != &x)
-				(*this) = x;
+			(*this) = x;
 		}
 
 		/*
@@ -231,7 +232,7 @@ class vector
 		/*
 		** Return reverse iterator to reverse beginning
 		** Returns a reverse iterator pointing to the last
-		** element in the vector (i.e., its reverse beginning).
+		** element in the vector(i.e., its reverse beginning).
 		** Reverse iterators iterate backwards: increasing them moves
 		** them towards the beginning of the container.
 		** rbegin points to the element right before the one that would
@@ -249,7 +250,7 @@ class vector
 		/*
 		** Return reverse iterator to reverse beginning
 		** Returns a reverse iterator pointing to the last
-		** element in the vector (i.e., its reverse beginning).
+		** element in the vector(i.e., its reverse beginning).
 		** Reverse iterators iterate backwards: increasing them moves
 		** them towards the beginning of the container.
 		** rbegin points to the element right before the one that would
@@ -267,9 +268,9 @@ class vector
 		/*
 		** Return reverse iterator to reverse end
 		** Returns a reverse iterator pointing to the theoretical element
-		** preceding the first element in the vector (which is considered its reverse end).
+		** preceding the first element in the vector(which is considered its reverse end).
 		** The range between vector::rbegin and vector::rend contains all
-		** the elements of the vector (in reverse order).
+		** the elements of the vector(in reverse order).
 		** @param void void
 		** @return A reverse iterator to the reverse end of the sequence container.
 		*/
@@ -281,9 +282,9 @@ class vector
 		/*
 		** Return reverse iterator to reverse end
 		** Returns a reverse iterator pointing to the theoretical element
-		** preceding the first element in the vector (which is considered its reverse end).
+		** preceding the first element in the vector(which is considered its reverse end).
 		** The range between vector::rbegin and vector::rend contains all
-		** the elements of the vector (in reverse order).
+		** the elements of the vector(in reverse order).
 		** @param void void
 		** @return A reverse iterator to the reverse end of the sequence container.
 		*/
@@ -326,22 +327,100 @@ class vector
 		}
 
 		/*
-		** Returns a copy of the allocator object associated with the vector.
-		** @param none none
-		** @return The allocator.
+		** Return maximum size
+		** Returns the maximum number of elements that the vector can hold.
+		** This is the maximum potential size the container can reach due
+		** to known system or library implementation limitations,
+		** but the container is by no means guaranteed to be able to reach that size:
+		** it can still fail to allocate storage at any point before that size is reached.
+		** @param void void
+		** @return The maximum number of elements a vector container can hold as content.
 		*/
-		allocator_type get_allocator() const
+		size_type max_size() const
 		{
-			return (this->_alloc);
+			return (this->_alloc.max_size());
 		}
 
 		/*
+		** Change size
+		** Resizes the container so that it contains n elements.
+		** If n is smaller than the current container size,
+		** the content is reduced to its first n elements,
+		** removing those beyond (and destroying them).
+		** If n is greater than the current container size,
+		** the content is expanded by inserting at the end as many elements
+		** as needed to reach a size of n. If val is specified,
+		** the new elements are initialized as copies of val, otherwise,
+		** they are value-initialized.
+		** If n is also greater than the current container capacity,
+		** an automatic reallocation of the allocated storage space takes place.
+		** Notice that this function changes the actual content
+		** of the container by inserting or erasing elements from it.
+		** @param n New container size, expressed in number of elements.
+		** @param val Object whose content is copied to the added elements in case that n is greater than the current container size.
+		*/
+		void resize(size_type n, value_type val = value_type())
+		{
+			if (n > this->capacity())
+			{
+				this->_realloc(n);
+				this->_fill(this->size(), n, val);
+				this->_size = n;
+			}
+			if (n < this->capacity())
+			{
+				if (n < this->size())
+				{
+					for (int i = n; i < this->size() - 1; i++)
+						this->_alloc.destroy(&this->_v[i]);
+					this->_size = n;
+				}
+				else
+					this->_fill(this->size(), n, val);
+			}
+		}
+
+		/*
+		** Test whether vector is empty
+		** Returns whether the vector is empty (i.e. whether its size is 0).
+		** This function does not modify the container in any way.
+		** To clear the content of a vector, see vector::clear.
+		** @param void void
+		** @return true if the container size is 0, false otherwise.
+		*/
+		bool empty() const
+		{
+			return (this->size() == 0);
+		}
+
+		/*
+		** Request a change in capacity
+		** Requests that the vector capacity be at least enough to contain n elements.
+		** If n is greater than the current vector capacity,
+		** the function causes the container to reallocate its storage increasing
+		** its capacity to n (or greater).
+		** In all other cases, the function call does not cause a reallocation
+		** and the vector capacity is not affected.
+		** This function has no effect on the vector size and cannot alter its elements.
+		** @param n Minimum capacity for the vector.
+		** @return void
+		*/
+		void reserve (size_type n)
+		{
+			if (n <= this->capacity())
+				return ;
+			this->_realloc(n);
+		}
+
+		/* ======================== */
+		/* ==== ELEMENT ACCESS ==== */
+		/* ======================== */
+		/*
 		** Access element
 		** Returns a reference to the element at position n in the vector container.
-		** A similar member function, vector::at,
-		** has the same behavior as this operator function,
-		** except that vector::at is bound-checked and signals if the requested position
-		** is out of range by throwing an out_of_range exception.
+		** A similar member function, vector::at, has the same behavior as this operator function,
+		** except that vector::at is bound-checked and signals
+		** if the requested position is out of range by throwing an out_of_range exception.
 		** Portable programs should never call this function with an argument n
 		** that is out of range, since this causes undefined behavior.
 		** @param n Position of an element in the container.
@@ -351,14 +430,13 @@ class vector
 		{
 			return (this->_v[n]);
 		}
-
+		
 		/*
 		** Access element
 		** Returns a reference to the element at position n in the vector container.
-		** A similar member function, vector::at,
-		** has the same behavior as this operator function,
-		** except that vector::at is bound-checked and signals if the requested position
-		** is out of range by throwing an out_of_range exception.
+		** A similar member function, vector::at, has the same behavior as this operator function,
+		** except that vector::at is bound-checked and signals
+		** if the requested position is out of range by throwing an out_of_range exception.
 		** Portable programs should never call this function with an argument n
 		** that is out of range, since this causes undefined behavior.
 		** @param n Position of an element in the container.
@@ -369,6 +447,97 @@ class vector
 			return (this->_v[n]);
 		}
 
+		/*
+		** Access element
+		** Returns a reference to the element at position n in the vector.
+		** The function automatically checks whether n is within
+		** the bounds of valid elements in the vector,
+		** throwing an out_of_range exception if it is not (i.e., if n is greater than,
+		** or equal to, its size). This is in contrast with member operator[],
+		** that does not check against bounds.
+		** @param n Position of an element in the container.
+		** @return The element at the specified position in the container.
+		*/
+		reference at (size_type n)
+		{
+			if (n > this->size())
+				throw std::out_of_range("oh boy, it's out of range exception, newbie :(");
+			return (this->_v[n]);
+		}
+
+		/*
+		** Access element
+		** Returns a reference to the element at position n in the vector.
+		** The function automatically checks whether n is within
+		** the bounds of valid elements in the vector,
+		** throwing an out_of_range exception if it is not (i.e., if n is greater than,
+		** or equal to, its size). This is in contrast with member operator[],
+		** that does not check against bounds.
+		** @param n Position of an element in the container.
+		** @return The element at the specified position in the container.
+		*/
+		const_reference at (size_type n) const
+		{
+			if (n > this->size())
+				throw std::out_of_range("oh boy, it's out of range exception, newbie :(");
+			return (this->_v[n]);
+		}
+
+		/*
+		** Access first element
+		** Returns a reference to the first element in the vector.
+		** Unlike member vector::begin, which returns an iterator to this same element,
+		** this function returns a direct reference.
+		** Calling this function on an empty container causes undefined behavior.
+		** @param void void
+		** @return A reference to the first element in the vector container.
+		*/
+		reference front()
+		{
+			return (*(this->_v));
+		}
+		
+		/*
+		** Access first element
+		** Returns a reference to the first element in the vector.
+		** Unlike member vector::begin, which returns an iterator to this same element,
+		** this function returns a direct reference.
+		** Calling this function on an empty container causes undefined behavior.
+		** @param void void
+		** @return A reference to the first element in the vector container.
+		*/
+		const_reference front() const
+		{
+			return (*(this->_v));
+		}
+
+		/*
+		** Access last element
+		** Returns a reference to the last element in the vector.
+		** Unlike member vector::end, which returns an iterator just past this element,
+		** this function returns a direct reference.
+		** Calling this function on an empty container causes undefined behavior.
+		** @param void void
+		** @return A reference to the last element in the vector.
+		*/
+		reference back()
+		{
+			return (this->_v[this->size() - 1]);
+		}
+		const_reference back() const
+		{
+			return (this->_v[this->size() - 1]);
+		}
+
+		/*
+		** Returns a copy of the allocator object associated with the vector.
+		** @param none none
+		** @return The allocator.
+		*/
+		allocator_type get_allocator() const
+		{
+			return (this->_alloc);
+		}
 
 		/* ============================== OPERATORS ============================== */
 		/*
@@ -382,11 +551,57 @@ class vector
 		*/
 		vector& operator= (const vector& x)
 		{
+			if (this == &x)
+				return ((*this));
+			for (int i = 0; i < this->capacity(); i++)
+				this->_alloc.destroy(&this->_v[i]);
+			if (this->capacity())
+				this->_alloc.deallocate(this->_v);
 			this->_size = x.size();
 			this->_capacity = x.capacity();
-			for (int i = 0; i < this->_size(); i++)
+			this->_alloc = x.get_allocator();
+			this->_v = nullptr;
+			if (!x.capacity())
+				return (*this);
+			this->_v = this->_alloc.allocate(x.capacity());
+			for (int i = 0; i < this->size(); i++)
 				this->_alloc.construct(&this->_v[i], x[i]);
+			return (*this);
 		}
+		/* ============================== HELPER FUNCTIONS ============================== */
+		private:
+			/*
+			** This function will fill the array from [start, end)
+			** @param start starting position
+			** @param end ending position
+			** @param val default value to be in place
+			** @return void
+			*/
+			void	_fill(std::size_t start, std::size_t end, value_type &val)
+			{
+				for (; start < end; start++)
+					this->_alloc.construct(&this->_v[start], val);
+			}
+
+			/*
+			** reallocating the array and make the capacity bigger to fit n element
+			** @param n new capacity
+			** @return void
+			*/
+			void	_realloc(std::size_t &n)
+			{
+				value_type *tmp = this->_alloc.allocate(n);
+
+				for (int i = 0; i < this->size(); i++)
+				{
+					this->_alloc.construct(&tmp[i], this->_v[i]);
+					this->_alloc.destroy(&this->_v[i]);
+				}
+				this->_alloc.deallocate(this->_v);
+				this->_v = tmp;
+				this->_capacity = n;
+			}
+
 };
 
 };

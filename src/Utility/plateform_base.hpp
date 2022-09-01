@@ -7,8 +7,6 @@
 
 #if defined (__linux__)
 
-# define ptrdiff_t __gnu_cxx::ptrdiff_t
-
 # define NULL (void*)0
 
 # define nullptr NULL
