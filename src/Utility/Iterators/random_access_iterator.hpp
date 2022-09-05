@@ -121,6 +121,18 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
             return (tmp);
         }
 
+        template <typename Type>
+        difference_type operator-(random_access_iterator<Type> const & src) const
+        {
+            return (this->_iter - src._iter);
+        }
+
+        template <typename Type>
+        difference_type operator+(random_access_iterator<Type> const & src) const
+        {
+            return (this->_iter + src._iter);
+        }
+
         random_access_iterator operator+=(difference_type n)
         {
             this->_iter += n;

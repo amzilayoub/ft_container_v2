@@ -39,7 +39,9 @@
 # include "../Utility/Iterators/random_access_iterator.hpp"
 # include "../Utility/Iterators/reverse_iterator.hpp"
 # include <stdexcept>
+
 # define __VECTOR_GROWTH_SIZE__ 2
+# define __EPSILON_SIZE__ 1
 
 namespace ft
 {
@@ -108,8 +110,7 @@ class vector
 		: _capacity(n), _size(n), _alloc(alloc)
 		{
 			this->_v = this->_alloc.allocate(n);
-			for (int i = 0; i < n; i++)
-				this->_alloc.construct(&this->_v[i], val);
+			this->assign(n, val);
 		}
 
 		/*
@@ -129,12 +130,8 @@ class vector
 		{
 			this->_size = 0;
 			this->_capacity = std::distance(first, last);
-			this->_alloc.allocate(this->_capacity);
-			while (first != last)
-			{
-				this->_alloc.construct(&this->_v[this->_size], *(first++));
-				++this->_size;
-			}
+			this->_alloc.allocate(this->capacity());
+			this->assign(first, last);
 		}
 
 		vector(const vector& x) : _alloc(x.get_allocator())
@@ -150,7 +147,7 @@ class vector
 		*/
 		~vector(void)
 		{
-			this->_alloc.deallocate(this->_v, this->_capacity);
+			this->_alloc.deallocate(this->_v, this->capacity());
 		}
 
 		/* ============================== MEMBER FUNCTIONS ============================== */
@@ -365,19 +362,16 @@ class vector
 			{
 				this->_realloc(n);
 				this->_fill(this->size(), n, val);
-				this->_size = n;
 			}
 			if (n < this->capacity())
 			{
 				if (n < this->size())
-				{
-					for (int i = n; i < this->size() - 1; i++)
+					for (size_type i = n; i < this->size() - 1; i++)
 						this->_alloc.destroy(&this->_v[i]);
-					this->_size = n;
-				}
 				else
 					this->_fill(this->size(), n, val);
 			}
+			this->_size = n;
 		}
 
 		/*
@@ -529,6 +523,195 @@ class vector
 			return (this->_v[this->size() - 1]);
 		}
 
+		/* ======================= */
+		/* ====== MODIFIERS ====== */
+		/* ======================= */
+		/*
+		** Assigns new contents to the vector, replacing its current
+		** contents, and modifying its size accordingly.
+		** In the range version (1), the new contents are elements constructed from
+		** each of the elements in the range between first and last, in the same order.
+		** If a reallocation happens,the storage needed is allocated using the internal allocator.
+		** @param first Input iterators to the initial positions in a sequence
+		** @param last Input iterators to the final positions in a sequence
+		** @return void
+		*/
+		template <class InputIterator>
+  		void assign (InputIterator first, InputIterator last)
+		{
+			size_type	distance;
+			size_type	i;
+
+			distance = std::distance(first, last);
+			if (this->size() > distance)
+				this->_destroy(distance, this->size());
+			if (distance > this->capacity())
+				this->reserve(distance);
+			this->_size = distance;
+			i = -1;
+			while(first != last)
+			{
+				this->_alloc.destroy(&this->_v[++i]);
+				this->_alloc.construct(this->_v[i], *(first++));
+			}
+		}
+
+		/*
+		** Assigns new contents to the vector, replacing its current
+		** contents, and modifying its size accordingly.
+		** In the fill version (2), the new contents are n elements,
+		** each initialized to a copy of val.
+		** If a reallocation happens,the storage needed is allocated using the internal allocator.
+		** @param n New size for the container.
+		** @param val Value to fill the container with. Each of the n elements in the container will be initialized to a copy of this value.
+		** @return void
+		*/
+		void assign (size_type n, const value_type& val)
+		{
+			if (n < this->size())
+				this->_destroy(n, this->size());
+			if (n > this->capacity())
+				this->reserve(n);
+			this->_size = n;
+			for (size_type i = 0; i < n; i++)
+			{
+				this->_alloc.destroy(&this->_v[i]);
+				this->_alloc.construct(&this->_v[i], val);
+			}
+		}
+
+		/*
+		** Adds a new element at the end of the vector, after its current last element.
+		** The content of val is copied (or moved) to the new element.
+		** This effectively increases the container size by one, which causes an automatic
+		** reallocation of the allocated storage space if -and only
+		** if- the new vector size surpasses the current vector capacity.
+		** @param val Value to be copied (or moved) to the new element.
+		** @return void
+		*/
+		void push_back (const value_type& val)
+		{
+			if (this->size() == this->capacity())
+				this->reserve((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__);
+			this->_alloc.construct(&this->_v[this->_size++], val);
+		}
+
+		/*
+		** Delete last element
+		** Removes the last element in the vector,
+		** effectively reducing the container size by one.
+		** This destroys the removed element.
+		** @param void void
+		** @return void
+		*/
+		void pop_back()
+		{
+			if (!this->size())
+				return ;
+			this->_alloc.destroy(&this->_v[--this->_size]);
+		}
+
+		/*
+		** Insert elements
+		** The vector is extended by inserting new elements before the element at the specified position,
+		** effectively increasing the container size by the number of elements inserted.
+		** This causes an automatic reallocation of the allocated storage
+		** space if -and only if- the new vector size surpasses the current vector capacity.
+		** Because vectors use an array as their underlying storage,
+		** inserting elements in positions other than the vector end causes
+		** the container to relocate all the elements that were after
+		** position to their new positions. This is generally an inefficient operation
+		** compared to the one performed for the same operation by other
+		** kinds of sequence containers (such as list or forward_list).
+		** The parameters determine how many elements are inserted and to which values they are initialized:
+		** @param position Position in the vector where the new elements are inserted.
+		** @param val Value to be copied (or moved) to the inserted elements.
+		** @return An iterator that points to the first of the newly inserted elements.
+		*/
+		iterator insert (iterator position, const value_type& val)
+		{
+			// size_type	distance;
+			// size_type	i;
+
+			// distance = std::distance(this->begin(), position);
+			// if (this->size() == this->capacity())
+			// 	this->reserve((distance + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__);
+			// for (i = this->size(); i > distance + 1; i--)
+			// 	std::swap(&this->_v[i], &this->_v[i - 1]);
+			// this->_alloc.construct(&this->_alloc[i], val);
+			// ++this->_size;
+			// return (iterator(&this->_v[i]));
+			return (this->_insert(position, 1, val));
+		}
+		
+		/*
+		** Insert elements
+		** The vector is extended by inserting new elements before the element at the specified position,
+		** effectively increasing the container size by the number of elements inserted.
+		** This causes an automatic reallocation of the allocated storage
+		** space if -and only if- the new vector size surpasses the current vector capacity.
+		** Because vectors use an array as their underlying storage,
+		** inserting elements in positions other than the vector end causes
+		** the container to relocate all the elements that were after
+		** position to their new positions. This is generally an inefficient operation
+		** compared to the one performed for the same operation by other
+		** kinds of sequence containers (such as list or forward_list).
+		** The parameters determine how many elements are inserted and to which values they are initialized:
+		** @param position Position in the vector where the new elements are inserted.
+		** @param n Number of elements to insert. Each element is initialized to a copy of val.
+		** @param val Value to be copied (or moved) to the inserted elements.
+		** @return void
+		*/
+		void insert (iterator position, size_type n, const value_type& val)
+		{
+			// size_type	distance;
+			// size_type	i;
+			// size_type	n_element;
+
+			// n_element = n;
+			// distance = std::distance(this->begin(), position);
+			// if (this->size() + n >= this->capacity())
+			// 	this->resize(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
+			// /*
+			// ** Here I substract a 1 since we will start the process from 0
+			// */
+			// i = this->size() + n - 1;
+			// for (; i > distance + n; i--)
+			// 	std::swap(&this->_v[i], &this->_v[i - n]);
+			// while (n--)
+			// 	this->_alloc.construct(this->_v[i++], val);
+			// this->_size += n_element;
+			(void)(this->_insert(position, n, val));
+		}
+		
+		/*
+		** Insert elements
+		** The vector is extended by inserting new elements before the element at the specified position,
+		** effectively increasing the container size by the number of elements inserted.
+		** This causes an automatic reallocation of the allocated storage
+		** space if -and only if- the new vector size surpasses the current vector capacity.
+		** Because vectors use an array as their underlying storage,
+		** inserting elements in positions other than the vector end causes
+		** the container to relocate all the elements that were after
+		** position to their new positions. This is generally an inefficient operation
+		** compared to the one performed for the same operation by other
+		** kinds of sequence containers (such as list or forward_list).
+		** The parameters determine how many elements are inserted and to which values they are initialized:
+		** @param position Position in the vector where the new elements are inserted.
+		** @param first Iterators specifying a range of elements. Copies of the elements in the range [first,last) are inserted at position (in the same order).
+		** @param last Iterators specifying a range of elements. Copies of the elements in the range [first,last) are inserted at position (in the same order).
+		** @return void
+		*/
+		template <class InputIterator>
+		void insert (iterator position, InputIterator first, InputIterator last);
+
+
+		
+
+
+		/* ======================== */
+		/* ======= ALLOATOR ======= */
+		/* ======================== */
 		/*
 		** Returns a copy of the allocator object associated with the vector.
 		** @param none none
@@ -553,7 +736,7 @@ class vector
 		{
 			if (this == &x)
 				return ((*this));
-			for (int i = 0; i < this->capacity(); i++)
+			for (size_type i = 0; i < this->capacity(); i++)
 				this->_alloc.destroy(&this->_v[i]);
 			if (this->capacity())
 				this->_alloc.deallocate(this->_v);
@@ -564,7 +747,7 @@ class vector
 			if (!x.capacity())
 				return (*this);
 			this->_v = this->_alloc.allocate(x.capacity());
-			for (int i = 0; i < this->size(); i++)
+			for (size_type i = 0; i < this->size(); i++)
 				this->_alloc.construct(&this->_v[i], x[i]);
 			return (*this);
 		}
@@ -584,23 +767,81 @@ class vector
 			}
 
 			/*
+			** This function will destroy the array from [start, end)
+			** @param start starting position
+			** @param end ending position
+			** @return void
+			*/
+			void	_destroy(std::size_t start, std::size_t end)
+			{
+				for (; start < end; start++)
+					this->_alloc.destroy(&this->_v[start]);
+			}
+
+			/*
 			** reallocating the array and make the capacity bigger to fit n element
 			** @param n new capacity
 			** @return void
 			*/
 			void	_realloc(std::size_t &n)
 			{
-				value_type *tmp = this->_alloc.allocate(n);
+				value_type *tmp;
 
-				for (int i = 0; i < this->size(); i++)
+				if (n == this->capacity())
+					return ;
+
+				tmp = this->_alloc.allocate(n);
+				for (size_type i = 0; i < this->size(); i++)
 				{
 					this->_alloc.construct(&tmp[i], this->_v[i]);
 					this->_alloc.destroy(&this->_v[i]);
 				}
-				this->_alloc.deallocate(this->_v);
+				this->_alloc.deallocate(this->_v, this->capacity());
 				this->_v = tmp;
 				this->_capacity = n;
 			}
+
+			/*
+			** Insert elements
+			** The vector is extended by inserting new elements before the element at the specified position,
+			** effectively increasing the container size by the number of elements inserted.
+			** This causes an automatic reallocation of the allocated storage
+			** space if -and only if- the new vector size surpasses the current vector capacity.
+			** Because vectors use an array as their underlying storage,
+			** inserting elements in positions other than the vector end causes
+			** the container to relocate all the elements that were after
+			** position to their new positions. This is generally an inefficient operation
+			** compared to the one performed for the same operation by other
+			** kinds of sequence containers (such as list or forward_list).
+			** The parameters determine how many elements are inserted and to which values they are initialized:
+			** @param position Position in the vector where the new elements are inserted.
+			** @param n Number of elements to insert. Each element is initialized to a copy of val.
+			** @param val Value to be copied (or moved) to the inserted elements.
+			** @return void
+			*/
+			iterator _insert (iterator position, size_type n, const value_type& val)
+			{
+				size_type	distance;
+				size_type	i;
+				size_type	n_element;
+
+				n_element = n;
+				distance = std::distance(this->begin(), position);
+				if (this->size() + n >= this->capacity())
+					this->reserve(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
+				/*
+				** Here I substract a 1 since we will start the process from 0
+				*/
+				i = this->size() + n - 1;
+				for (; i >= distance + n; i--)
+					std::swap(this->_v[i], this->_v[i - n]);
+				while (n--)
+					this->_alloc.construct(&this->_v[i++], val);
+				this->_size += n_element;
+				return (iterator(this->_v[i - n_element]));
+			}
+
+			
 
 };
 
