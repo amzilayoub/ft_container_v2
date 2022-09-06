@@ -703,7 +703,25 @@ class vector
 		** @return void
 		*/
 		template <class InputIterator>
-		void insert (iterator position, InputIterator first, InputIterator last);
+		void insert (iterator position, InputIterator first, InputIterator last)
+		{
+			size_type	distance;
+			size_type	i;
+			size_type	n;
+
+			n = std::distance(first, last);
+			distance = std::distance(this->begin(), position);
+			if (this->size() + n >= this->capacity())
+				this->resize(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
+			/*
+			** Here I substract a 1 since we will start the process from 0
+			*/
+			i = this->size() + n - 1;
+			for (; i > distance + n; i--)
+				std::swap(this->_v[i], this->_v[i - n]);
+			while (first != last)
+				this->_alloc.construct(&this->_v[i++], *(first++));
+		}
 
 
 		
@@ -739,7 +757,7 @@ class vector
 			for (size_type i = 0; i < this->capacity(); i++)
 				this->_alloc.destroy(&this->_v[i]);
 			if (this->capacity())
-				this->_alloc.deallocate(this->_v);
+				this->_alloc.deallocate(this->_v, this->capacity());
 			this->_size = x.size();
 			this->_capacity = x.capacity();
 			this->_alloc = x.get_allocator();
@@ -836,7 +854,7 @@ class vector
 				for (; i >= distance + n; i--)
 					std::swap(this->_v[i], this->_v[i - n]);
 				while (n--)
-					this->_alloc.construct(&this->_v[i++], val);
+					this->_alloc.construct(&this->_v[i--], val);
 				this->_size += n_element;
 				return (iterator(this->_v[i - n_element]));
 			}

@@ -5,13 +5,34 @@
 int main()
 {
     ft::vector<int> array(5);
+    ft::vector<int> copy;
 
-    array[0] = 1;
+    array[0] = 11;
     array[1] = 22;
     array[2] = 33;
-    array.insert(array.begin(), 50);
-    array.push_back(array[0]);
-    ft::vector<int>::iterator it = array.begin();
+
+    copy.push_back(1);
+    copy.push_back(2);
+    copy.push_back(3);
+
+    std::cout << "=======COPY=========" << std::endl;
+
+    ft::vector<int>::iterator it = copy.begin();
+    for (; it != copy.end(); it++)
+    {
+        std::cout << (*it) << std::endl;
+    }
+
+    it = array.begin();
+    std::cout << "=======BEFORE ARRAY=========" << std::endl;
+    for (; it != array.end(); it++)
+    {
+        std::cout << (*it) << std::endl;
+    }
+
+    array.insert(array.end(), 5, 9);
+    it = array.begin();
+    std::cout << "=======ARRAY=========" << std::endl;
     for (; it != array.end(); it++)
     {
         std::cout << (*it) << std::endl;
