@@ -38,6 +38,8 @@
 # include <memory>
 # include "../Utility/Iterators/random_access_iterator.hpp"
 # include "../Utility/Iterators/reverse_iterator.hpp"
+# include "../Utility/enable_if.hpp"
+# include "../Utility/is_integral.hpp"
 # include <stdexcept>
 
 # define __VECTOR_GROWTH_SIZE__ 2
@@ -630,18 +632,12 @@ class vector
 		*/
 		iterator insert (iterator position, const value_type& val)
 		{
-			// size_type	distance;
-			// size_type	i;
+			size_type pos;
 
-			// distance = std::distance(this->begin(), position);
-			// if (this->size() == this->capacity())
-			// 	this->reserve((distance + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__);
-			// for (i = this->size(); i > distance + 1; i--)
-			// 	std::swap(&this->_v[i], &this->_v[i - 1]);
-			// this->_alloc.construct(&this->_alloc[i], val);
-			// ++this->_size;
-			// return (iterator(&this->_v[i]));
-			return (this->_insert(position, 1, val));
+			pos = this->_prepare_insert(position, 1);
+			this->_alloc.construct(&this->_v[pos], val);
+			++this->_size;
+			return (iterator(&this->_v[pos]));
 		}
 		
 		/*
@@ -662,26 +658,16 @@ class vector
 		** @param val Value to be copied (or moved) to the inserted elements.
 		** @return void
 		*/
-		void insert (iterator position, size_type n, const value_type& val)
+		void insert (iterator position,size_type n, const value_type& val)
 		{
-			// size_type	distance;
-			// size_type	i;
-			// size_type	n_element;
+			size_type pos;
+			size_type i;
 
-			// n_element = n;
-			// distance = std::distance(this->begin(), position);
-			// if (this->size() + n >= this->capacity())
-			// 	this->resize(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
-			// /*
-			// ** Here I substract a 1 since we will start the process from 0
-			// */
-			// i = this->size() + n - 1;
-			// for (; i > distance + n; i--)
-			// 	std::swap(&this->_v[i], &this->_v[i - n]);
-			// while (n--)
-			// 	this->_alloc.construct(this->_v[i++], val);
-			// this->_size += n_element;
-			(void)(this->_insert(position, n, val));
+			pos = (this->_prepare_insert(position, n));
+			i = n;
+			while (i--)
+				this->_alloc.construct(&this->_v[pos--], val);
+			this->_size += n;
 		}
 		
 		/*
@@ -703,24 +689,21 @@ class vector
 		** @return void
 		*/
 		template <class InputIterator>
-		void insert (iterator position, InputIterator first, InputIterator last)
+		void insert (
+					iterator position,
+					InputIterator first,
+					InputIterator last,
+					typename ft::enable_if<!(ft::is_integral<InputIterator>::value), InputIterator>::type = 0
+					)
 		{
-			size_type	distance;
-			size_type	i;
-			size_type	n;
+			size_type pos;
+			size_type distance;
 
-			n = std::distance(first, last);
-			distance = std::distance(this->begin(), position);
-			if (this->size() + n >= this->capacity())
-				this->resize(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
-			/*
-			** Here I substract a 1 since we will start the process from 0
-			*/
-			i = this->size() + n - 1;
-			for (; i > distance + n; i--)
-				std::swap(this->_v[i], this->_v[i - n]);
-			while (first != last)
-				this->_alloc.construct(&this->_v[i++], *(first++));
+			distance = std::distance(first, last);
+			pos = this->_prepare_insert(position, distance);
+			while (first != last--)
+				this->_alloc.construct(&this->_v[pos--], *(last));
+			this->_size += distance;
 		}
 
 
@@ -837,7 +820,7 @@ class vector
 			** @param val Value to be copied (or moved) to the inserted elements.
 			** @return void
 			*/
-			iterator _insert (iterator position, size_type n, const value_type& val)
+			size_type _prepare_insert (iterator position, size_type n)
 			{
 				size_type	distance;
 				size_type	i;
@@ -853,10 +836,7 @@ class vector
 				i = this->size() + n - 1;
 				for (; i >= distance + n; i--)
 					std::swap(this->_v[i], this->_v[i - n]);
-				while (n--)
-					this->_alloc.construct(&this->_v[i--], val);
-				this->_size += n_element;
-				return (iterator(this->_v[i - n_element]));
+				return (i);
 			}
 
 			

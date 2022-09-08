@@ -2,6 +2,8 @@
 # include "src/containers/Vector.hpp"
 # include <iostream>
 
+# include <vector>
+
 int main()
 {
     ft::vector<int> array(5);
@@ -15,6 +17,9 @@ int main()
     copy.push_back(2);
     copy.push_back(3);
 
+	std::cout << "INSERT IT = " << *(copy.insert(copy.begin(), 10)) << std::endl;
+	copy.insert(copy.begin(), 3, 99);
+	copy.insert(copy.begin(), array.begin(), array.end());
     std::cout << "=======COPY=========" << std::endl;
 
     ft::vector<int>::iterator it = copy.begin();
