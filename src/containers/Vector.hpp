@@ -127,7 +127,8 @@ class vector
 		*/
 		template <class InputIterator>
         vector(InputIterator first, InputIterator last,
-            const allocator_type& alloc = allocator_type())
+            const allocator_type& alloc = allocator_type(),
+			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = 0)
 		: _alloc(alloc)
 		{
 			this->_size = 0;
@@ -539,7 +540,11 @@ class vector
 		** @return void
 		*/
 		template <class InputIterator>
-  		void assign (InputIterator first, InputIterator last)
+  		void assign (
+			  	InputIterator first,
+				InputIterator last,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = 0
+				)
 		{
 			size_type	distance;
 			size_type	i;
@@ -707,8 +712,121 @@ class vector
 		}
 
 
-		
+		/*
+		** Erase elements
+		** Removes from the vector either a single element (position) or a range of elements ([first,last)).
+		** This effectively reduces the container size by the number of elements removed, which are destroyed.
+		** Because vectors use an array as their underlying storage,
+		** erasing elements in positions other than the vector end causes
+		** the container to relocate all the elements after the segment
+		** erased to their new positions. This is generally an inefficient operation
+		** compared to the one performed for the same operation by other kinds of sequence
+		** containers (such as list or forward_list).
+		** @param position Iterator pointing to a single element to be removed from the vector.
+		** @return An iterator pointing to the new location of the element that followed the last element erased by the function call
+		*/
+		iterator erase (iterator position)
+		{
+			size_type distance;
+			size_type i;
 
+			distance = std::distance(this->begin(), position);
+			this->_alloc.destroy(&this->_v[distance]);
+			i = distance;
+			for (; i < this->size() - 1; i++)
+				this->_v[i] = this->_v[i + 1];
+			this->_alloc.destroy(&this->_v[i]);
+			--this->_size;
+			return (iterator(&this->_v[distance]));
+		}
+
+		/*
+		** Erase elements
+		** Removes from the vector either a single element (position) or a range of elements ([first,last)).
+		** This effectively reduces the container size by the number of elements removed, which are destroyed.
+		** Because vectors use an array as their underlying storage,
+		** erasing elements in positions other than the vector end causes
+		** the container to relocate all the elements after the segment
+		** erased to their new positions. This is generally an inefficient operation
+		** compared to the one performed for the same operation by other kinds of sequence
+		** containers (such as list or forward_list).
+		** @param first Iterators specifying a range within the vector] to be removed: [first,last)
+		** @param last Iterators specifying a range within the vector] to be removed: [first,last)
+		** @return An iterator pointing to the new location of the element that followed the last element erased by the function call
+		*/
+		iterator erase (iterator first, iterator last)
+		{
+			size_type	first_element_dst;
+			size_type	last_element_dst;
+			size_type	first_it;
+			size_type	last_it;
+			
+			first_element_dst = std::distance(this->begin(), first);
+			last_element_dst = std::distance(this->begin(), last);
+			while (first != last)
+			{
+				this->_alloc.destroy(&(*first));
+				++first;
+			}
+			first_it = first_element_dst;
+			last_it = last_element_dst;
+			while (last_it < this->size())
+				this->_v[first_it++] = this->_v[last_it++];
+			while (first_it < this->size())
+				this->_alloc.destroy(&this->_v[first_it++]);
+			this->_size -= (last_element_dst - first_element_dst);
+			return (iterator(&this->_v[first_it]));
+		}
+
+		/*
+		** Swap content
+		** Exchanges the content of the container by the content of x,
+		** which is another vector object of the same type. Sizes may differ.
+		** After the call to this member function, the elements in this container
+		** are those which were in x before the call, and the elements of x
+		** are those which were in this. All iterators,
+		** references and pointers remain valid for the swapped objects.
+		** Notice that a non-member function exists with the same name,
+		** swap, overloading that algorithm with an optimization that behaves like this member function.
+		** @param x Another vector container of the same type
+		** @return void
+		*/
+		void swap (vector& x)
+		{
+			value_type		*tmp_v;
+			size_type		tmp_capacity;
+			size_type		tmp_size;
+			allocator_type	tmp_alloc;
+
+			tmp_v = x._v;
+			tmp_capacity = x._capacity;
+			tmp_size = x._size;
+			tmp_alloc = x._alloc;
+
+			x._v = this->_v;
+			x._capacity = this->_capacity;
+			x._size = this->_size;
+			x._alloc = this->_alloc;
+
+			this->_v = tmp_v;
+			this->_capacity = tmp_capacity;
+			this->_size = tmp_size;
+			this->_alloc = tmp_alloc;
+		}
+
+		/*
+		** Clear content
+		** Removes all elements from the vector (which are destroyed),
+		** leaving the container with a size of 0.
+		** A reallocation is not guaranteed to happen,
+		** and the vector capacity is not guaranteed to change due to calling this function
+		** @param void void
+		** @return void
+		*/
+		void clear()
+		{
+			this->erase(this->begin(), this->end());
+		}
 
 		/* ======================== */
 		/* ======= ALLOATOR ======= */
@@ -838,9 +956,31 @@ class vector
 					std::swap(this->_v[i], this->_v[i - n]);
 				return (i);
 			}
-
-			
-
 };
+
+
+/* ============================== NON-FUNCTIONS MEMBER FUNCTION OVERLOADS ============================== */
+/*
+** Exchange contents of vectors
+** The contents of container x are exchanged with those of y.
+** Both container objects must be of the same type (same template parameters),
+** although sizes may differ.
+** After the call to this member function, the elements in x are those which
+** were in y before the call, and the elements of y are those which were in x.
+** All iterators, references and pointers remain valid for the swapped objects.
+** This is an overload of the generic algorithm swap that improves its performance
+** by mutually transferring ownership over their assets to the other container 
+** i.e., the containers exchange references to their data,
+** without actually performing any element copy or movement): It behaves as if x.swap(y) was called.
+** @param x vector containers of the same type
+** @param y vector containers of the same type
+** @return void
+*/
+
+template <class T, class Alloc>
+void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+{
+	x.swap(y);
+}
 
 };

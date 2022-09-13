@@ -107,7 +107,7 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
 
         random_access_iterator operator+(difference_type n) const
         {
-            random_access_iterator tmp(this);
+            random_access_iterator tmp((*this));
 
             tmp._iter += n;
             return (tmp);
@@ -115,7 +115,7 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
 
         random_access_iterator operator-(difference_type n) const
         {
-            random_access_iterator tmp(this);
+            random_access_iterator tmp((*this));
 
             tmp._iter -= n;
             return (tmp);
