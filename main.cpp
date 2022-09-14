@@ -1,6 +1,7 @@
 
 # include "src/containers/Vector.hpp"
 # include <iostream>
+# include "src/Utility/algorithms.hpp"
 
 # include <vector>
 
@@ -16,11 +17,6 @@ int main()
     copy.push_back(1);
     copy.push_back(2);
     copy.push_back(3);
-
-	copy.swap(array);
-	copy.clear();
-	std::cout << "BEGIN = " << (*copy.begin()) << std::endl;
-    std::cout << "=======COPY=========" << std::endl;
     ft::vector<int>::iterator it = copy.begin();
 	it = copy.begin();
     for (; it != copy.end(); it++)
@@ -34,13 +30,12 @@ int main()
     {
         std::cout << (*it) << std::endl;
     }
+
+	std:: cout << "COMPARAISON" << std::endl;
+	std::cout << (copy == array) << std::endl;
+	std::cout << (copy != array) << std::endl;
+	std::cout << (copy < array) << std::endl;
+	std::cout << (copy <= array) << std::endl;
+	std::cout << (copy > array) << std::endl;
+	std::cout << (copy >= array) << std::endl;
 }
-
-// # include <vector>
-
-// int main()
-// {
-//     std::vector<int> list;
-
-//     list.insert(list.end() + 2, 1);
-// }

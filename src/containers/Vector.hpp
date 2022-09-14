@@ -40,6 +40,9 @@
 # include "../Utility/Iterators/reverse_iterator.hpp"
 # include "../Utility/enable_if.hpp"
 # include "../Utility/is_integral.hpp"
+# include "../Utility/comparison_helper_functions.hpp"
+# include "../Utility/algorithms.hpp"
+
 # include <stdexcept>
 
 # define __VECTOR_GROWTH_SIZE__ 2
@@ -976,11 +979,63 @@ class vector
 ** @param y vector containers of the same type
 ** @return void
 */
-
 template <class T, class Alloc>
 void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
 {
 	x.swap(y);
+}
+
+
+/* ============================== RELATIONAL OPERATORS ============================== */
+/*
+** Relational operators for vector
+** Performs the appropriate comparison operation between the vector containers lhs and rhs.
+** The equality comparison (operator==) is performed by first comparing sizes,
+** and if they match, the elements are compared sequentially using operator==,
+** stopping at the first mismatch (as if using algorithm equal).
+** The less-than comparison (operator<) behaves as if using algorithm lexicographical_compare,
+** which compares the elements sequentially using operator< in a reciprocal manner
+** (i.e., checking both a<b and b<a) and stopping at the first occurrence.
+** @param lhs vector containers
+** @param rhs vector containers
+** @return true if the condition holds, and false otherwise.
+*/
+
+template <class T, class Alloc>
+bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+template <class T, class Alloc>
+bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return !(lhs == rhs);
+}
+
+template <class T, class Alloc>
+bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (ft::lexicographical_compare(
+			lhs.begin(),lhs.end(),
+			rhs.begin(), rhs.end()));
+}
+
+template <class T, class Alloc>
+bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin(), ft::is_less_than_or_equal<T>));
+}
+
+template <class T, class Alloc>
+bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (rhs < lhs);
+}
+
+template <class T, class Alloc>
+bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+{
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin(), ft::is_great_than_or_equal<T>));
 }
 
 };
