@@ -23,10 +23,6 @@ namespace ft
 template <class Iterator>
 class reverse_iterator
 {
-	/* ============================== MEMBER ATTRIBUTES ============================== */
-	private:
-		Iterator	_iter;
-
 	/* ============================== MEMBER TYPE ============================== */
 	public:
 		typedef	Iterator													iterator_type;
@@ -35,6 +31,10 @@ class reverse_iterator
 		typedef typename ft::iterator_traits<Iterator>::difference_type		difference_type;
 		typedef typename ft::iterator_traits<Iterator>::pointer				pointer;
 		typedef typename ft::iterator_traits<Iterator>::reference			reference;
+
+	/* ============================== MEMBER ATTRIBUTES ============================== */
+	private:
+		iterator_type	_iter;
 
 	/* ============================== CONSTRUCTOR/DESTRUCTOR ============================== */
 	public:
@@ -81,9 +81,7 @@ class reverse_iterator
 		*/
 		iterator_type base() const
 		{
-			iterator_type it(this->_iter);
-
-			return (it);
+			return (this->_iter);
 		}
 
 		/* ============================== OPERATORS OVERLOADING ============================== */
@@ -256,6 +254,15 @@ class reverse_iterator
 		{
 			assert(n >= 0);
 			return (this->base()[-n - 1]);
+		}
+
+		/*
+		** Overload
+		*/
+		reverse_iterator &operator=(reverse_iterator const &rhs)
+		{
+			this->_iter = rhs._iter;
+			return (*this);
 		}
 };
 

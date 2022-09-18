@@ -20,8 +20,6 @@ namespace ft
 template <typename T>
 class random_access_iterator : public ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >
 {
-    
-
     /* ============================== MEMBER TYPE ============================== */
     public:
         typedef typename ft::iterator_traits<ft::iterator<std::random_access_iterator_tag, T> >::value_type value_type;
@@ -49,6 +47,11 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
             (*this) = rhs;
         }
 
+        operator random_access_iterator<const value_type> ()
+        {
+            return (random_access_iterator<const value_type>(_iter));
+        }
+
     /* ============================== MEMBER FUNCTIONS ============================== */
     public:
         value_type *base() const
@@ -60,7 +63,7 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
     public:
         random_access_iterator &operator=(random_access_iterator const &rhs)
         {
-            this->_iter = rhs.base();
+            this->_iter = rhs._iter;
 
             return (*this);
         }
@@ -72,7 +75,7 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
 
         pointer operator->(void) const
         {
-            return (*this->operator*());
+            return (&(this->operator*()));
         }
 
         random_access_iterator &operator++(void)
@@ -146,6 +149,11 @@ class random_access_iterator : public ft::iterator_traits<ft::iterator<std::rand
 
             return (*this);
         }
+
+        reference operator[] (difference_type n)
+		{
+			return (*(this->_iter + n));
+		}
 };
 
 template <class Iterator>

@@ -1,31 +1,31 @@
 /*
 ** VECTOR:
 ** Vectors are sequence containers representing arrays that can change in size.
-** Just like arrays, vectors use contiguous storage locations for their elements,
+** Just like arrays, Vectors use contiguous storage locations for their elements,
 ** which means that their elements can also be accessed using offsets on regular pointers to its elements,
 ** and just as efficiently as in arrays. But unlike arrays, their size can change dynamically,
 ** with their storage being handled automatically by the container.
 ** 
-** Internally, vectors use a dynamically allocated array to store their elements.
+** Internally, Vectors use a dynamically allocated array to store their elements.
 ** This array may need to be reallocated in order to grow in size when new elements are inserted,
 ** which implies allocating a new array and moving all elements to it.
 ** This is a relatively expensive task in terms of processing time,
-** and thus, vectors do not reallocate each time an element is added to the container.
+** and thus, Vectors do not reallocate each time an element is added to the container.
 ** 
-** Instead, vector containers may allocate some extra storage to accommodate for possible growth,
+** Instead, Vector containers may allocate some extra storage to accommodate for possible growth,
 ** and thus the container may have an actual capacity greater than the storage strictly needed to
 ** contain its elements (i.e., its size). Libraries can implement different strategies for growth
 ** to balance between memory usage and reallocations, but in any case,
 ** reallocations should only happen at logarithmically growing intervals of size so that
-** the insertion of individual elements at the end of the vector can be provided with amortized
+** the insertion of individual elements at the end of the Vector can be provided with amortized
 ** constant time complexity (see push_back).
 ** 
-** Therefore, compared to arrays, vectors consume more memory in exchange for the ability to manage
+** Therefore, compared to arrays, Vectors consume more memory in exchange for the ability to manage
 ** storage and grow dynamically in an efficient way.
 ** 
 ** Compared to the other dynamic sequence containers
 ** (deques, lists and forward_lists),
-** vectors are very efficient accessing its elements (just like arrays) and
+** Vectors are very efficient accessing its elements (just like arrays) and
 ** relatively efficient adding or removing elements from its end.
 ** For operations that involve inserting or removing elements at positions other than the end,
 ** they perform worse than the others, and have less consistent iterators and references
@@ -52,7 +52,7 @@ namespace ft
 {
 
 template < class T, class Alloc = std::allocator<T> >
-class vector
+class Vector
 {
 
 	/* ============================== MEMBER TYPE ============================== */
@@ -73,7 +73,7 @@ class vector
 		typedef typename ft::random_access_iterator<const value_type>	const_iterator;
 
 		typedef typename ft::reverse_iterator<iterator>					reverse_iterator;
-		typedef typename ft::reverse_iterator<const iterator>			const_reverse_iterator;
+		typedef typename ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 
 		/* a signed integral type, identical to: ptrdiff_t */
 		typedef typename allocator_type::difference_type				difference_type;
@@ -97,7 +97,7 @@ class vector
 		** @param alloc Allocator object.
 		** @return none none
 		*/
-		explicit vector(const allocator_type& alloc = allocator_type())
+		explicit Vector(const allocator_type& alloc = allocator_type())
 		: _v(nullptr), _capacity(0), _size(0), _alloc(alloc)
 		{
 		}
@@ -110,7 +110,7 @@ class vector
 		** @param alloc Allocator object.
 		** @return none none
 		*/
-		explicit vector(size_type n, const value_type& val = value_type(),
+		explicit Vector(size_type n, const value_type& val = value_type(),
             const allocator_type& alloc = allocator_type())
 		: _capacity(n), _size(n), _alloc(alloc)
 		{
@@ -129,9 +129,9 @@ class vector
 		** @return none none
 		*/
 		template <class InputIterator>
-        vector(InputIterator first, InputIterator last,
+        Vector(InputIterator first, InputIterator last,
             const allocator_type& alloc = allocator_type(),
-			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = 0)
+			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
 		: _alloc(alloc)
 		{
 			this->_size = 0;
@@ -140,18 +140,18 @@ class vector
 			this->assign(first, last);
 		}
 
-		vector(const vector& x) : _alloc(x.get_allocator())
+		Vector(const Vector& x) : _alloc(x.get_allocator())
 		{
 			(*this) = x;
 		}
 
 		/*
 		** This destroys all container elements, and deallocates
-		** all the storage capacity allocated by the vector using its allocator.
+		** all the storage capacity allocated by the Vector using its allocator.
 		** @param void void
 		** @return none
 		*/
-		~vector(void)
+		~Vector(void)
 		{
 			this->_alloc.deallocate(this->_v, this->capacity());
 		}
@@ -162,8 +162,8 @@ class vector
 		/* =================== */
 		/*
 		** Return iterator to beginning
-		** Returns an iterator pointing to the first element in the vector.
-		** Notice that, unlike member vector::front,
+		** Returns an iterator pointing to the first element in the Vector.
+		** Notice that, unlike member Vector::front,
 		** which returns a reference to the first element,
 		** this function returns a random access iterator pointing to it.
 		** If the container is empty,
@@ -178,8 +178,8 @@ class vector
 
 		/*
 		** Return iterator to beginning
-		** Returns an iterator pointing to the first element in the vector.
-		** Notice that, unlike member vector::front,
+		** Returns an iterator pointing to the first element in the Vector.
+		** Notice that, unlike member Vector::front,
 		** which returns a reference to the first element,
 		** this function returns a random access iterator pointing to it.
 		** If the container is empty,
@@ -193,17 +193,17 @@ class vector
 		}
 
 		/*
-		** Returns an iterator referring to the past-the-end element in the vector container.
+		** Returns an iterator referring to the past-the-end element in the Vector container.
 		** The past-the-end element is the theoretical element
-		** that would follow the last element in the vector.
+		** that would follow the last element in the Vector.
 		** It does not point to any element, and thus shall not be dereferenced.
 		** Because the ranges used by functions of the standard
 		** library do not include the element pointed by their
 		** closing iterator, this function is often used in
-		** combination with vector::begin to specify a range
+		** combination with Vector::begin to specify a range
 		** including all the elements in the container.
 		** If the container is empty, this function returns
-		** the same as vector::begin.
+		** the same as Vector::begin.
 		** @param void void
 		** @return An iterator to the element past the end of the sequence.
 		*/
@@ -213,17 +213,17 @@ class vector
 		}
 
 		/*
-		** Returns an iterator referring to the past-the-end element in the vector container.
+		** Returns an iterator referring to the past-the-end element in the Vector container.
 		** The past-the-end element is the theoretical element
-		** that would follow the last element in the vector.
+		** that would follow the last element in the Vector.
 		** It does not point to any element, and thus shall not be dereferenced.
 		** Because the ranges used by functions of the standard
 		** library do not include the element pointed by their
 		** closing iterator, this function is often used in
-		** combination with vector::begin to specify a range
+		** combination with Vector::begin to specify a range
 		** including all the elements in the container.
 		** If the container is empty, this function returns
-		** the same as vector::begin.
+		** the same as Vector::begin.
 		** @param void void
 		** @return An iterator to the element past the end of the sequence.
 		*/
@@ -235,12 +235,12 @@ class vector
 		/*
 		** Return reverse iterator to reverse beginning
 		** Returns a reverse iterator pointing to the last
-		** element in the vector(i.e., its reverse beginning).
+		** element in the Vector(i.e., its reverse beginning).
 		** Reverse iterators iterate backwards: increasing them moves
 		** them towards the beginning of the container.
 		** rbegin points to the element right before the one that would
 		** be pointed to by member end.
-		** Notice that unlike member vector::back, which returns a reference
+		** Notice that unlike member Vector::back, which returns a reference
 		** to this same element, this function returns a reverse random access iterator.
 		** @param void void
 		** @return A reverse iterator to the reverse beginning of the sequence container.
@@ -253,12 +253,12 @@ class vector
 		/*
 		** Return reverse iterator to reverse beginning
 		** Returns a reverse iterator pointing to the last
-		** element in the vector(i.e., its reverse beginning).
+		** element in the Vector(i.e., its reverse beginning).
 		** Reverse iterators iterate backwards: increasing them moves
 		** them towards the beginning of the container.
 		** rbegin points to the element right before the one that would
 		** be pointed to by member end.
-		** Notice that unlike member vector::back, which returns a reference
+		** Notice that unlike member Vector::back, which returns a reference
 		** to this same element, this function returns a reverse random access iterator.
 		** @param void void
 		** @return A reverse iterator to the reverse beginning of the sequence container.
@@ -271,9 +271,9 @@ class vector
 		/*
 		** Return reverse iterator to reverse end
 		** Returns a reverse iterator pointing to the theoretical element
-		** preceding the first element in the vector(which is considered its reverse end).
-		** The range between vector::rbegin and vector::rend contains all
-		** the elements of the vector(in reverse order).
+		** preceding the first element in the Vector(which is considered its reverse end).
+		** The range between Vector::rbegin and Vector::rend contains all
+		** the elements of the Vector(in reverse order).
 		** @param void void
 		** @return A reverse iterator to the reverse end of the sequence container.
 		*/
@@ -285,9 +285,9 @@ class vector
 		/*
 		** Return reverse iterator to reverse end
 		** Returns a reverse iterator pointing to the theoretical element
-		** preceding the first element in the vector(which is considered its reverse end).
-		** The range between vector::rbegin and vector::rend contains all
-		** the elements of the vector(in reverse order).
+		** preceding the first element in the Vector(which is considered its reverse end).
+		** The range between Vector::rbegin and Vector::rend contains all
+		** the elements of the Vector(in reverse order).
 		** @param void void
 		** @return A reverse iterator to the reverse end of the sequence container.
 		*/
@@ -300,8 +300,8 @@ class vector
 		/* ==== CAPACITY ==== */
 		/* ================== */
 		/*
-		** Returns the number of elements in the vector.
-		** This is the number of actual objects held in the vector,
+		** Returns the number of elements in the Vector.
+		** This is the number of actual objects held in the Vector,
 		** which is not necessarily equal to its storage capacity.
 		** @param void void
 		** @return The number of elements in the container.
@@ -312,17 +312,17 @@ class vector
 		}
 
 		/*
-		** Returns the size of the storage space currently allocated for the vector,
+		** Returns the size of the storage space currently allocated for the Vector,
 		** expressed in terms of elements.
-		** This capacity is not necessarily equal to the vector size.
+		** This capacity is not necessarily equal to the Vector size.
 		** It can be equal or greater, with the extra space allowing
 		** to accommodate for growth without the need to reallocate on each insertion.
-		** Notice that this capacity does not suppose a limit on the size of the vector.
+		** Notice that this capacity does not suppose a limit on the size of the Vector.
 		** When this capacity is exhausted and more is needed,
 		** it is automatically expanded by the container (reallocating it storage space).
-		** The theoretical limit on the size of a vector is given by member max_size.
+		** The theoretical limit on the size of a Vector is given by member max_size.
 		** @param none none
-		** @return The size of the currently allocated storage capacity in the vector, measured in terms of the number elements it can hold.
+		** @return The size of the currently allocated storage capacity in the Vector, measured in terms of the number elements it can hold.
 		*/
 		size_type capacity() const
 		{
@@ -331,13 +331,13 @@ class vector
 
 		/*
 		** Return maximum size
-		** Returns the maximum number of elements that the vector can hold.
+		** Returns the maximum number of elements that the Vector can hold.
 		** This is the maximum potential size the container can reach due
 		** to known system or library implementation limitations,
 		** but the container is by no means guaranteed to be able to reach that size:
 		** it can still fail to allocate storage at any point before that size is reached.
 		** @param void void
-		** @return The maximum number of elements a vector container can hold as content.
+		** @return The maximum number of elements a Vector container can hold as content.
 		*/
 		size_type max_size() const
 		{
@@ -381,10 +381,10 @@ class vector
 		}
 
 		/*
-		** Test whether vector is empty
-		** Returns whether the vector is empty (i.e. whether its size is 0).
+		** Test whether Vector is empty
+		** Returns whether the Vector is empty (i.e. whether its size is 0).
 		** This function does not modify the container in any way.
-		** To clear the content of a vector, see vector::clear.
+		** To clear the content of a Vector, see Vector::clear.
 		** @param void void
 		** @return true if the container size is 0, false otherwise.
 		*/
@@ -395,14 +395,14 @@ class vector
 
 		/*
 		** Request a change in capacity
-		** Requests that the vector capacity be at least enough to contain n elements.
-		** If n is greater than the current vector capacity,
+		** Requests that the Vector capacity be at least enough to contain n elements.
+		** If n is greater than the current Vector capacity,
 		** the function causes the container to reallocate its storage increasing
 		** its capacity to n (or greater).
 		** In all other cases, the function call does not cause a reallocation
-		** and the vector capacity is not affected.
-		** This function has no effect on the vector size and cannot alter its elements.
-		** @param n Minimum capacity for the vector.
+		** and the Vector capacity is not affected.
+		** This function has no effect on the Vector size and cannot alter its elements.
+		** @param n Minimum capacity for the Vector.
 		** @return void
 		*/
 		void reserve (size_type n)
@@ -417,14 +417,14 @@ class vector
 		/* ======================== */
 		/*
 		** Access element
-		** Returns a reference to the element at position n in the vector container.
-		** A similar member function, vector::at, has the same behavior as this operator function,
-		** except that vector::at is bound-checked and signals
+		** Returns a reference to the element at position n in the Vector container.
+		** A similar member function, Vector::at, has the same behavior as this operator function,
+		** except that Vector::at is bound-checked and signals
 		** if the requested position is out of range by throwing an out_of_range exception.
 		** Portable programs should never call this function with an argument n
 		** that is out of range, since this causes undefined behavior.
 		** @param n Position of an element in the container.
-		** @return The element at the specified position in the vector.
+		** @return The element at the specified position in the Vector.
 		*/
 		reference operator[] (size_type n)
 		{
@@ -433,14 +433,14 @@ class vector
 		
 		/*
 		** Access element
-		** Returns a reference to the element at position n in the vector container.
-		** A similar member function, vector::at, has the same behavior as this operator function,
-		** except that vector::at is bound-checked and signals
+		** Returns a reference to the element at position n in the Vector container.
+		** A similar member function, Vector::at, has the same behavior as this operator function,
+		** except that Vector::at is bound-checked and signals
 		** if the requested position is out of range by throwing an out_of_range exception.
 		** Portable programs should never call this function with an argument n
 		** that is out of range, since this causes undefined behavior.
 		** @param n Position of an element in the container.
-		** @return The element at the specified position in the vector.
+		** @return The element at the specified position in the Vector.
 		*/
 		const_reference operator[] (size_type n) const
 		{
@@ -449,9 +449,9 @@ class vector
 
 		/*
 		** Access element
-		** Returns a reference to the element at position n in the vector.
+		** Returns a reference to the element at position n in the Vector.
 		** The function automatically checks whether n is within
-		** the bounds of valid elements in the vector,
+		** the bounds of valid elements in the Vector,
 		** throwing an out_of_range exception if it is not (i.e., if n is greater than,
 		** or equal to, its size). This is in contrast with member operator[],
 		** that does not check against bounds.
@@ -467,9 +467,9 @@ class vector
 
 		/*
 		** Access element
-		** Returns a reference to the element at position n in the vector.
+		** Returns a reference to the element at position n in the Vector.
 		** The function automatically checks whether n is within
-		** the bounds of valid elements in the vector,
+		** the bounds of valid elements in the Vector,
 		** throwing an out_of_range exception if it is not (i.e., if n is greater than,
 		** or equal to, its size). This is in contrast with member operator[],
 		** that does not check against bounds.
@@ -485,12 +485,12 @@ class vector
 
 		/*
 		** Access first element
-		** Returns a reference to the first element in the vector.
-		** Unlike member vector::begin, which returns an iterator to this same element,
+		** Returns a reference to the first element in the Vector.
+		** Unlike member Vector::begin, which returns an iterator to this same element,
 		** this function returns a direct reference.
 		** Calling this function on an empty container causes undefined behavior.
 		** @param void void
-		** @return A reference to the first element in the vector container.
+		** @return A reference to the first element in the Vector container.
 		*/
 		reference front()
 		{
@@ -499,12 +499,12 @@ class vector
 		
 		/*
 		** Access first element
-		** Returns a reference to the first element in the vector.
-		** Unlike member vector::begin, which returns an iterator to this same element,
+		** Returns a reference to the first element in the Vector.
+		** Unlike member Vector::begin, which returns an iterator to this same element,
 		** this function returns a direct reference.
 		** Calling this function on an empty container causes undefined behavior.
 		** @param void void
-		** @return A reference to the first element in the vector container.
+		** @return A reference to the first element in the Vector container.
 		*/
 		const_reference front() const
 		{
@@ -513,12 +513,12 @@ class vector
 
 		/*
 		** Access last element
-		** Returns a reference to the last element in the vector.
-		** Unlike member vector::end, which returns an iterator just past this element,
+		** Returns a reference to the last element in the Vector.
+		** Unlike member Vector::end, which returns an iterator just past this element,
 		** this function returns a direct reference.
 		** Calling this function on an empty container causes undefined behavior.
 		** @param void void
-		** @return A reference to the last element in the vector.
+		** @return A reference to the last element in the Vector.
 		*/
 		reference back()
 		{
@@ -533,7 +533,7 @@ class vector
 		/* ====== MODIFIERS ====== */
 		/* ======================= */
 		/*
-		** Assigns new contents to the vector, replacing its current
+		** Assigns new contents to the Vector, replacing its current
 		** contents, and modifying its size accordingly.
 		** In the range version (1), the new contents are elements constructed from
 		** each of the elements in the range between first and last, in the same order.
@@ -546,7 +546,7 @@ class vector
   		void assign (
 			  	InputIterator first,
 				InputIterator last,
-				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = 0
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator()
 				)
 		{
 			size_type	distance;
@@ -562,12 +562,12 @@ class vector
 			while(first != last)
 			{
 				this->_alloc.destroy(&this->_v[++i]);
-				this->_alloc.construct(this->_v[i], *(first++));
+				this->_alloc.construct(&this->_v[i], *(first++));
 			}
 		}
 
 		/*
-		** Assigns new contents to the vector, replacing its current
+		** Assigns new contents to the Vector, replacing its current
 		** contents, and modifying its size accordingly.
 		** In the fill version (2), the new contents are n elements,
 		** each initialized to a copy of val.
@@ -591,11 +591,11 @@ class vector
 		}
 
 		/*
-		** Adds a new element at the end of the vector, after its current last element.
+		** Adds a new element at the end of the Vector, after its current last element.
 		** The content of val is copied (or moved) to the new element.
 		** This effectively increases the container size by one, which causes an automatic
 		** reallocation of the allocated storage space if -and only
-		** if- the new vector size surpasses the current vector capacity.
+		** if- the new Vector size surpasses the current Vector capacity.
 		** @param val Value to be copied (or moved) to the new element.
 		** @return void
 		*/
@@ -608,7 +608,7 @@ class vector
 
 		/*
 		** Delete last element
-		** Removes the last element in the vector,
+		** Removes the last element in the Vector,
 		** effectively reducing the container size by one.
 		** This destroys the removed element.
 		** @param void void
@@ -623,18 +623,18 @@ class vector
 
 		/*
 		** Insert elements
-		** The vector is extended by inserting new elements before the element at the specified position,
+		** The Vector is extended by inserting new elements before the element at the specified position,
 		** effectively increasing the container size by the number of elements inserted.
 		** This causes an automatic reallocation of the allocated storage
-		** space if -and only if- the new vector size surpasses the current vector capacity.
-		** Because vectors use an array as their underlying storage,
-		** inserting elements in positions other than the vector end causes
+		** space if -and only if- the new Vector size surpasses the current Vector capacity.
+		** Because Vectors use an array as their underlying storage,
+		** inserting elements in positions other than the Vector end causes
 		** the container to relocate all the elements that were after
 		** position to their new positions. This is generally an inefficient operation
 		** compared to the one performed for the same operation by other
 		** kinds of sequence containers (such as list or forward_list).
 		** The parameters determine how many elements are inserted and to which values they are initialized:
-		** @param position Position in the vector where the new elements are inserted.
+		** @param position Position in the Vector where the new elements are inserted.
 		** @param val Value to be copied (or moved) to the inserted elements.
 		** @return An iterator that points to the first of the newly inserted elements.
 		*/
@@ -650,18 +650,18 @@ class vector
 		
 		/*
 		** Insert elements
-		** The vector is extended by inserting new elements before the element at the specified position,
+		** The Vector is extended by inserting new elements before the element at the specified position,
 		** effectively increasing the container size by the number of elements inserted.
 		** This causes an automatic reallocation of the allocated storage
-		** space if -and only if- the new vector size surpasses the current vector capacity.
-		** Because vectors use an array as their underlying storage,
-		** inserting elements in positions other than the vector end causes
+		** space if -and only if- the new Vector size surpasses the current Vector capacity.
+		** Because Vectors use an array as their underlying storage,
+		** inserting elements in positions other than the Vector end causes
 		** the container to relocate all the elements that were after
 		** position to their new positions. This is generally an inefficient operation
 		** compared to the one performed for the same operation by other
 		** kinds of sequence containers (such as list or forward_list).
 		** The parameters determine how many elements are inserted and to which values they are initialized:
-		** @param position Position in the vector where the new elements are inserted.
+		** @param position Position in the Vector where the new elements are inserted.
 		** @param n Number of elements to insert. Each element is initialized to a copy of val.
 		** @param val Value to be copied (or moved) to the inserted elements.
 		** @return void
@@ -680,18 +680,18 @@ class vector
 		
 		/*
 		** Insert elements
-		** The vector is extended by inserting new elements before the element at the specified position,
+		** The Vector is extended by inserting new elements before the element at the specified position,
 		** effectively increasing the container size by the number of elements inserted.
 		** This causes an automatic reallocation of the allocated storage
-		** space if -and only if- the new vector size surpasses the current vector capacity.
-		** Because vectors use an array as their underlying storage,
-		** inserting elements in positions other than the vector end causes
+		** space if -and only if- the new Vector size surpasses the current Vector capacity.
+		** Because Vectors use an array as their underlying storage,
+		** inserting elements in positions other than the Vector end causes
 		** the container to relocate all the elements that were after
 		** position to their new positions. This is generally an inefficient operation
 		** compared to the one performed for the same operation by other
 		** kinds of sequence containers (such as list or forward_list).
 		** The parameters determine how many elements are inserted and to which values they are initialized:
-		** @param position Position in the vector where the new elements are inserted.
+		** @param position Position in the Vector where the new elements are inserted.
 		** @param first Iterators specifying a range of elements. Copies of the elements in the range [first,last) are inserted at position (in the same order).
 		** @param last Iterators specifying a range of elements. Copies of the elements in the range [first,last) are inserted at position (in the same order).
 		** @return void
@@ -701,7 +701,7 @@ class vector
 					iterator position,
 					InputIterator first,
 					InputIterator last,
-					typename ft::enable_if<!(ft::is_integral<InputIterator>::value), InputIterator>::type = 0
+					typename ft::enable_if<!(ft::is_integral<InputIterator>::value), InputIterator>::type = InputIterator()
 					)
 		{
 			size_type pos;
@@ -717,15 +717,15 @@ class vector
 
 		/*
 		** Erase elements
-		** Removes from the vector either a single element (position) or a range of elements ([first,last)).
+		** Removes from the Vector either a single element (position) or a range of elements ([first,last)).
 		** This effectively reduces the container size by the number of elements removed, which are destroyed.
-		** Because vectors use an array as their underlying storage,
-		** erasing elements in positions other than the vector end causes
+		** Because Vectors use an array as their underlying storage,
+		** erasing elements in positions other than the Vector end causes
 		** the container to relocate all the elements after the segment
 		** erased to their new positions. This is generally an inefficient operation
 		** compared to the one performed for the same operation by other kinds of sequence
 		** containers (such as list or forward_list).
-		** @param position Iterator pointing to a single element to be removed from the vector.
+		** @param position Iterator pointing to a single element to be removed from the Vector.
 		** @return An iterator pointing to the new location of the element that followed the last element erased by the function call
 		*/
 		iterator erase (iterator position)
@@ -745,16 +745,16 @@ class vector
 
 		/*
 		** Erase elements
-		** Removes from the vector either a single element (position) or a range of elements ([first,last)).
+		** Removes from the Vector either a single element (position) or a range of elements ([first,last)).
 		** This effectively reduces the container size by the number of elements removed, which are destroyed.
-		** Because vectors use an array as their underlying storage,
-		** erasing elements in positions other than the vector end causes
+		** Because Vectors use an array as their underlying storage,
+		** erasing elements in positions other than the Vector end causes
 		** the container to relocate all the elements after the segment
 		** erased to their new positions. This is generally an inefficient operation
 		** compared to the one performed for the same operation by other kinds of sequence
 		** containers (such as list or forward_list).
-		** @param first Iterators specifying a range within the vector] to be removed: [first,last)
-		** @param last Iterators specifying a range within the vector] to be removed: [first,last)
+		** @param first Iterators specifying a range within the Vector] to be removed: [first,last)
+		** @param last Iterators specifying a range within the Vector] to be removed: [first,last)
 		** @return An iterator pointing to the new location of the element that followed the last element erased by the function call
 		*/
 		iterator erase (iterator first, iterator last)
@@ -784,17 +784,17 @@ class vector
 		/*
 		** Swap content
 		** Exchanges the content of the container by the content of x,
-		** which is another vector object of the same type. Sizes may differ.
+		** which is another Vector object of the same type. Sizes may differ.
 		** After the call to this member function, the elements in this container
 		** are those which were in x before the call, and the elements of x
 		** are those which were in this. All iterators,
 		** references and pointers remain valid for the swapped objects.
 		** Notice that a non-member function exists with the same name,
 		** swap, overloading that algorithm with an optimization that behaves like this member function.
-		** @param x Another vector container of the same type
+		** @param x Another Vector container of the same type
 		** @return void
 		*/
-		void swap (vector& x)
+		void swap (Vector& x)
 		{
 			value_type		*tmp_v;
 			size_type		tmp_capacity;
@@ -819,10 +819,10 @@ class vector
 
 		/*
 		** Clear content
-		** Removes all elements from the vector (which are destroyed),
+		** Removes all elements from the Vector (which are destroyed),
 		** leaving the container with a size of 0.
 		** A reallocation is not guaranteed to happen,
-		** and the vector capacity is not guaranteed to change due to calling this function
+		** and the Vector capacity is not guaranteed to change due to calling this function
 		** @param void void
 		** @return void
 		*/
@@ -835,7 +835,7 @@ class vector
 		/* ======= ALLOATOR ======= */
 		/* ======================== */
 		/*
-		** Returns a copy of the allocator object associated with the vector.
+		** Returns a copy of the allocator object associated with the Vector.
 		** @param none none
 		** @return The allocator.
 		*/
@@ -851,10 +851,10 @@ class vector
 		** Copies all the elements from x into the container.
 		** The container preserves its current allocator,
 		** which is used to allocate storage in case of reallocation.
-		** @param x A vector object of the same type
+		** @param x A Vector object of the same type
 		** @return *this
 		*/
-		vector& operator= (const vector& x)
+		Vector& operator= (const Vector& x)
 		{
 			if (this == &x)
 				return ((*this));
@@ -925,18 +925,18 @@ class vector
 
 			/*
 			** Insert elements
-			** The vector is extended by inserting new elements before the element at the specified position,
+			** The Vector is extended by inserting new elements before the element at the specified position,
 			** effectively increasing the container size by the number of elements inserted.
 			** This causes an automatic reallocation of the allocated storage
-			** space if -and only if- the new vector size surpasses the current vector capacity.
-			** Because vectors use an array as their underlying storage,
-			** inserting elements in positions other than the vector end causes
+			** space if -and only if- the new Vector size surpasses the current Vector capacity.
+			** Because Vectors use an array as their underlying storage,
+			** inserting elements in positions other than the Vector end causes
 			** the container to relocate all the elements that were after
 			** position to their new positions. This is generally an inefficient operation
 			** compared to the one performed for the same operation by other
 			** kinds of sequence containers (such as list or forward_list).
 			** The parameters determine how many elements are inserted and to which values they are initialized:
-			** @param position Position in the vector where the new elements are inserted.
+			** @param position Position in the Vector where the new elements are inserted.
 			** @param n Number of elements to insert. Each element is initialized to a copy of val.
 			** @param val Value to be copied (or moved) to the inserted elements.
 			** @return void
@@ -964,7 +964,7 @@ class vector
 
 /* ============================== NON-FUNCTIONS MEMBER FUNCTION OVERLOADS ============================== */
 /*
-** Exchange contents of vectors
+** Exchange contents of Vectors
 ** The contents of container x are exchanged with those of y.
 ** Both container objects must be of the same type (same template parameters),
 ** although sizes may differ.
@@ -975,12 +975,12 @@ class vector
 ** by mutually transferring ownership over their assets to the other container 
 ** i.e., the containers exchange references to their data,
 ** without actually performing any element copy or movement): It behaves as if x.swap(y) was called.
-** @param x vector containers of the same type
-** @param y vector containers of the same type
+** @param x Vector containers of the same type
+** @param y Vector containers of the same type
 ** @return void
 */
 template <class T, class Alloc>
-void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+void swap (Vector<T,Alloc>& x, Vector<T,Alloc>& y)
 {
 	x.swap(y);
 }
@@ -988,32 +988,32 @@ void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
 
 /* ============================== RELATIONAL OPERATORS ============================== */
 /*
-** Relational operators for vector
-** Performs the appropriate comparison operation between the vector containers lhs and rhs.
+** Relational operators for Vector
+** Performs the appropriate comparison operation between the Vector containers lhs and rhs.
 ** The equality comparison (operator==) is performed by first comparing sizes,
 ** and if they match, the elements are compared sequentially using operator==,
 ** stopping at the first mismatch (as if using algorithm equal).
 ** The less-than comparison (operator<) behaves as if using algorithm lexicographical_compare,
 ** which compares the elements sequentially using operator< in a reciprocal manner
 ** (i.e., checking both a<b and b<a) and stopping at the first occurrence.
-** @param lhs vector containers
-** @param rhs vector containers
+** @param lhs Vector containers
+** @param rhs Vector containers
 ** @return true if the condition holds, and false otherwise.
 */
 
 template <class T, class Alloc>
-bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator== (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
 	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 template <class T, class Alloc>
-bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator!= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
 	return !(lhs == rhs);
 }
 
 template <class T, class Alloc>
-bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator<  (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
 	return (ft::lexicographical_compare(
 			lhs.begin(),lhs.end(),
@@ -1021,19 +1021,19 @@ bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 }
 
 template <class T, class Alloc>
-bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator<= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
 	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin(), ft::is_less_than_or_equal<T>));
 }
 
 template <class T, class Alloc>
-bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator>  (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
 	return (rhs < lhs);
 }
 
 template <class T, class Alloc>
-bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+bool operator>= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
 	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin(), ft::is_great_than_or_equal<T>));
 }
