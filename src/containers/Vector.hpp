@@ -779,7 +779,7 @@ class Vector
 			while (first_it < this->size())
 				this->_alloc.destroy(&this->_v[first_it++]);
 			this->_size -= (last_element_dst - first_element_dst);
-			return (iterator(&this->_v[first_it]));
+			return (iterator(&this->_v[first_element_dst]));
 		}
 
 		/*
@@ -858,7 +858,16 @@ class Vector
 		Vector& operator= (const Vector& x)
 		{
 			if (this == &x)
-				return ((*this));
+				return (*this);
+			if (this->capacity() == x.capacity())
+			{
+				this->_destroy(0, this->size());
+				this->_alloc = x.get_allocator();
+				for (size_type i = 0 ; i < x.size(); i++)
+					this->_alloc.construct(&this->_v[i], x._v[i]);
+				this->_size = x.size();
+				return (*this);
+			}
 			this->_destroy(0, this->capacity());
 			if (this->capacity())
 				this->_alloc.deallocate(this->_v, this->capacity());
@@ -950,8 +959,8 @@ class Vector
 
 				n_element = n;
 				distance = std::distance(this->begin(), position);
-				if (this->size() + n >= this->capacity())
-					this->reserve(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
+				if (this->size() + n > this->capacity())
+					this->reserve((this->capacity() * 2) > n ? (this->capacity() * 2) : n);
 				/*
 				** Here I substract a 1 since we will start the process from 0
 				*/
@@ -1005,6 +1014,8 @@ void swap (Vector<T,Alloc>& x, Vector<T,Alloc>& y)
 template <class T, class Alloc>
 bool operator== (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
+	if (lhs.size() != rhs.size())
+		return (false);
 	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 }
 template <class T, class Alloc>
@@ -1024,7 +1035,7 @@ bool operator<  (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 template <class T, class Alloc>
 bool operator<= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
-	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin(), ft::is_less_than_or_equal<T>));
+	return (!(rhs < lhs));
 }
 
 template <class T, class Alloc>
@@ -1036,7 +1047,7 @@ bool operator>  (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 template <class T, class Alloc>
 bool operator>= (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
-	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin(), ft::is_great_than_or_equal<T>));
+	return (!(rhs > lhs));
 }
 
 };
