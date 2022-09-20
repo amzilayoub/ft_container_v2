@@ -63,7 +63,7 @@ class reverse_iterator
 		** @param rev_t An iterator of a reverse_iterator type, whose sense of iteration is preserved.
 		*/
 		template <class Iter>
-  		reverse_iterator (const reverse_iterator<Iter>& rev_it) : _iter(++(rev_it.base()))
+  		reverse_iterator (const reverse_iterator<Iter>& rev_it) : _iter(rev_it.base())
 		{
 		}
 
@@ -143,7 +143,7 @@ class reverse_iterator
 		{
 			reverse_iterator it(*this);
 
-			--(*this);
+			--this->_iter;
 			return (it);
 		}
 
@@ -205,7 +205,7 @@ class reverse_iterator
 		{
 			reverse_iterator it((*this));
 
-			++(*this);
+			++this->_iter;
 			return (it);
 		}
 
@@ -261,7 +261,7 @@ class reverse_iterator
 		*/
 		reverse_iterator &operator=(reverse_iterator const &rhs)
 		{
-			this->_iter = rhs._iter;
+			this->_iter = rhs.base();
 			return (*this);
 		}
 };

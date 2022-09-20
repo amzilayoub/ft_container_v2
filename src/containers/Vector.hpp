@@ -112,7 +112,7 @@ class Vector
 		*/
 		explicit Vector(size_type n, const value_type& val = value_type(),
             const allocator_type& alloc = allocator_type())
-		: _capacity(n), _size(n), _alloc(alloc)
+		: _capacity(n), _size(0), _alloc(alloc)
 		{
 			this->_v = this->_alloc.allocate(n);
 			this->assign(n, val);
@@ -132,11 +132,9 @@ class Vector
         Vector(InputIterator first, InputIterator last,
             const allocator_type& alloc = allocator_type(),
 			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
-		: _alloc(alloc)
+		: _capacity(0), _size(0), _alloc(alloc)
 		{
 			this->_size = 0;
-			this->_capacity = std::distance(first, last);
-			this->_alloc.allocate(this->capacity());
 			this->assign(first, last);
 		}
 
@@ -557,13 +555,11 @@ class Vector
 				this->_destroy(distance, this->size());
 			if (distance > this->capacity())
 				this->reserve(distance);
+			this->_destroy(0, this->size());
 			this->_size = distance;
 			i = -1;
 			while(first != last)
-			{
-				this->_alloc.destroy(&this->_v[++i]);
-				this->_alloc.construct(&this->_v[i], *(first++));
-			}
+				this->_alloc.construct(&this->_v[++i], *(first++));
 		}
 
 		/*
@@ -582,12 +578,10 @@ class Vector
 				this->_destroy(n, this->size());
 			if (n > this->capacity())
 				this->reserve(n);
+			this->_destroy(0, this->size());
 			this->_size = n;
 			for (size_type i = 0; i < n; i++)
-			{
-				this->_alloc.destroy(&this->_v[i]);
 				this->_alloc.construct(&this->_v[i], val);
-			}
 		}
 
 		/*
@@ -602,7 +596,14 @@ class Vector
 		void push_back (const value_type& val)
 		{
 			if (this->size() == this->capacity())
-				this->reserve((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__);
+			{
+				/*
+				** the condition this->capacity() == 0 is set in case the capacity is zero
+				** so in this case, the multiplication of this->capacity() * __VECTOR_GROWTH_SIZE__ is 0
+				** that's why we add 1 since we cannot reserve a capacity of 0
+				*/
+				this->reserve((this->capacity() * __VECTOR_GROWTH_SIZE__) + (this->capacity() == 0));
+			}
 			this->_alloc.construct(&this->_v[this->_size++], val);
 		}
 
@@ -858,8 +859,7 @@ class Vector
 		{
 			if (this == &x)
 				return ((*this));
-			for (size_type i = 0; i < this->capacity(); i++)
-				this->_alloc.destroy(&this->_v[i]);
+			this->_destroy(0, this->capacity());
 			if (this->capacity())
 				this->_alloc.deallocate(this->_v, this->capacity());
 			this->_size = x.size();
@@ -918,7 +918,8 @@ class Vector
 					this->_alloc.construct(&tmp[i], this->_v[i]);
 					this->_alloc.destroy(&this->_v[i]);
 				}
-				this->_alloc.deallocate(this->_v, this->capacity());
+				if (this->capacity())
+					this->_alloc.deallocate(this->_v, this->capacity());
 				this->_v = tmp;
 				this->_capacity = n;
 			}
