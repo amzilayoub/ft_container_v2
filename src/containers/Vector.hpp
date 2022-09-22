@@ -960,11 +960,14 @@ class Vector
 				n_element = n;
 				distance = std::distance(this->begin(), position);
 				if (this->size() + n > this->capacity())
-					this->reserve((this->capacity() * 2) > n ? (this->capacity() * 2) : n);
+					this->reserve(((this->capacity() * 2) > this->size() + n) ? (this->capacity() * 2) : this->size() + n);
+					// this->reserve(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
 				/*
 				** Here I substract a 1 since we will start the process from 0
 				*/
 				i = this->size() + n - 1;
+				for (size_type j = 0; j < n; j++)
+					this->_alloc.construct(&this->_v[this->size() + j], value_type());
 				for (; i >= distance + n; i--)
 					std::swap(this->_v[i], this->_v[i - n]);
 				return (i);
