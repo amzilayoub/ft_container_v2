@@ -54,7 +54,6 @@ namespace ft
 template < class T, class Alloc = std::allocator<T> >
 class Vector
 {
-
 	/* ============================== MEMBER TYPE ============================== */
 	public:
 		/* The first template parameter (T) */
@@ -138,7 +137,8 @@ class Vector
 			this->assign(first, last);
 		}
 
-		Vector(const Vector& x) : _alloc(x.get_allocator())
+		Vector(const Vector& x)
+        : _capacity(0), _size(0), _alloc(x.get_allocator())
 		{
 			(*this) = x;
 		}
@@ -151,6 +151,8 @@ class Vector
 		*/
 		~Vector(void)
 		{
+            for (size_type i = 0; i < this->size(); i++)
+                this->_alloc.destroy(&this->_v[i]);
 			this->_alloc.deallocate(this->_v, this->capacity());
 		}
 
@@ -522,6 +524,16 @@ class Vector
 		{
 			return (this->_v[this->size() - 1]);
 		}
+
+		/*
+		** Access last element
+		** Returns a reference to the last element in the Vector.
+		** Unlike member Vector::end, which returns an iterator just past this element,
+		** this function returns a direct reference.
+		** Calling this function on an empty container causes undefined behavior.
+		** @param void void
+		** @return A reference to the last element in the Vector.
+		*/
 		const_reference back() const
 		{
 			return (this->_v[this->size() - 1]);
@@ -961,7 +973,6 @@ class Vector
 				distance = std::distance(this->begin(), position);
 				if (this->size() + n > this->capacity())
 					this->reserve(((this->capacity() * 2) > this->size() + n) ? (this->capacity() * 2) : this->size() + n);
-					// this->reserve(((this->capacity() + __EPSILON_SIZE__) * __VECTOR_GROWTH_SIZE__) + n);
 				/*
 				** Here I substract a 1 since we will start the process from 0
 				*/
@@ -1013,7 +1024,6 @@ void swap (Vector<T,Alloc>& x, Vector<T,Alloc>& y)
 ** @param rhs Vector containers
 ** @return true if the condition holds, and false otherwise.
 */
-
 template <class T, class Alloc>
 bool operator== (const Vector<T,Alloc>& lhs, const Vector<T,Alloc>& rhs)
 {
