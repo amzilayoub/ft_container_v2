@@ -58,10 +58,10 @@ class Vector
 	public:
 		/* The first template parameter (T) */
 		typedef T											value_type;
-		
+
 		/* 	The second template parameter (Alloc) */
 		typedef Alloc													allocator_type;
-	
+
 		typedef typename allocator_type::reference						reference;
 		typedef typename allocator_type::const_reference				const_reference;
 		typedef typename allocator_type::pointer						pointer;
@@ -79,7 +79,6 @@ class Vector
 
 		/* an unsigned integral type that can represent any non-negative value of difference_type */
 		typedef typename allocator_type::size_type						size_type;
-
 
 	/* ============================== MEMBER ATTRIBUTES ============================== */
 	private:

@@ -27,7 +27,7 @@ struct pair {
     ** @param void void
     ** @return void
     */
-    pair() : first(first_type()), second(second_type())
+    pair() : first(), second()
     {
     }
 
