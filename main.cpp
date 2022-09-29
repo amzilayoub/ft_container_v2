@@ -10,7 +10,7 @@
 #define TIME_FAC 20
 # include <vector>
 #include <sys/time.h>
-
+# include <map>
 
 time_t get_time(void)
 {
@@ -23,5 +23,16 @@ time_t get_time(void)
 
 int main()
 {
-    ft::AVL<int, int> tree;
+    ft::AVL<int, int> *tree = NULL;
+	tree = tree->insert(tree, ft::make_pair(30, 10));
+	tree = tree->insert(tree, ft::make_pair(10, 10));
+	tree = tree->insert(tree, ft::make_pair(100, 10));
+	tree = tree->insert(tree, ft::make_pair(999, 10));
+	tree = tree->insert(tree, ft::make_pair(999, 999));
+
+	tree->print(tree);
+	std::cout << "=======================" << std::endl;
+	tree->_right = tree->left_rotation(tree->_right);
+	tree->print(tree);
+	delete tree;
 }

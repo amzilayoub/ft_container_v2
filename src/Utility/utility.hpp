@@ -49,9 +49,9 @@ struct pair {
     ** @param pr Another pair object.
     ** @return void
     */
-    template<class U, class V> pair(const pair<U, V> &p)
+    template<class U, class V>
+	pair(const pair<U, V> &p) : first(p.first), second(p.second)
     {
-        (*this) = p;
     }
 
     /* ============================== CONSTRUCTORS ============================== */
