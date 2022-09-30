@@ -153,7 +153,6 @@ namespace ft
 					
 					root->height = height + 1;
 				}
-
 			};
 		/* ============================== CONSTRUCTOR/DESTRUCTOR ============================== */
 		public:
@@ -224,13 +223,25 @@ namespace ft
 			** @param value value to be inserted in the tree
 			** @return the new root after inserting the new value
 			*/
+			node *insert(node *root, value_type const value)
+			{
+				return (this->insert(root, NULL, value));
+			}
+
+			/*
+			** Insert the value in the tree
+			** @param root a tree pointing to the root object
+			** @param parent parent of the root
+			** @param value value to be inserted in the tree
+			** @return the new root after inserting the new value
+			*/
 			node *insert(node *root, node *parent, value_type const value)
 			{
 				int balance;
 
 				if (!root)
 					root = this->create_node(value);
-				else if (root->value.first == value.first)
+				else if (root->get_key() == value.first)
 					root->value->second = value.second;
 				else if (this->_compare(root->value->first, value.first))
 					root->right = this->insert(root->right, root, value);
@@ -251,7 +262,10 @@ namespace ft
 						** then the new element will be inserted in the left as well
 						*/
 						if (value.first < root->left->get_key())
+						{
+							std::cout << "LEFT LEFT CASE" << std::endl;
 							root = root->right_rotation();
+						}
 						else
 						{
 							/*
@@ -259,6 +273,7 @@ namespace ft
 							*/
 							root->left = root->left->left_rotation();
 							root = root->right_rotation();
+							std::cout << "LEFT RIGHT CASE" << std::endl;
 						}
 					}
 					else
@@ -267,7 +282,10 @@ namespace ft
 						** RIGHT RIGHT CASE, Read the comment for the LEFT LEFT CASE and reverse it to understand this block
 						*/
 						if (value.first > root->right->get_key())
+						{
 							root = root->left_rotation();
+							std::cout << "RIGHT RIGHT CASE" << std::endl;
+						}
 						else
 						{
 							/*
@@ -275,9 +293,15 @@ namespace ft
 							*/
 							root->right = root->right->right_rotation();
 							root = root->left_rotation();
+							std::cout << "RIGHT LEFT CASE" << std::endl;
 						}						
 					}
+					std::cout << "ROOT: " << root->get_key();
+					if (root->parent)
+						std::cout << " - PARENT: " << (root->parent->get_key());
+					std::cout  << std::endl;
 				}
+				root->update_height(root);
 				return (root);
 			}
 
@@ -317,5 +341,8 @@ namespace ft
 			typename allocator_type::template rebind<node>::other	_alloc_node;
 			Compare													_compare;
 	};
+
+	/* ============================== HELPER FUNCTIONS ============================== */
+
 
 };

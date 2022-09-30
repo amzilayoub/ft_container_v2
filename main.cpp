@@ -23,15 +23,16 @@ time_t get_time(void)
 
 int main()
 {
-    // ft::AVL<int, int> tree;
-	// tree.root = tree.insert(tree.root, ft::make_pair(30, 10));
-	// tree.root = tree.insert(tree.root, ft::make_pair(10, 10));
-	// tree.root = tree.insert(tree.root, ft::make_pair(100, 10));
-	// tree.root = tree.insert(tree.root, ft::make_pair(999, 10));
-	// tree.root = tree.insert(tree.root, ft::make_pair(999, 999));
+    ft::AVL<int, int> tree;
+	tree.root = tree.insert(tree.root, ft::make_pair(10, 10));
+	tree.root = tree.insert(tree.root, ft::make_pair(5, 10));
+	tree.root = tree.insert(tree.root, ft::make_pair(20, 10));
+	tree.root = tree.insert(tree.root, ft::make_pair(2, 10));
 
-	// tree.print(tree.root);
-	// std::cout << "==========" << std::endl;
-	// tree.root = tree.left_rotation(tree.root);
-	// tree.print(tree.root);
+	std::cout << "==========" << std::endl;
+	tree.print(tree.root);
+	std::cout << "==========" << std::endl;
+	tree.root = tree.insert(tree.root, ft::make_pair(3, 10));
+	std::cout << "==========" << std::endl;
+	tree.print(tree.root);
 }
