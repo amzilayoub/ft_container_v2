@@ -74,6 +74,86 @@ namespace ft
 					return (this->value->second);
 				}
 
+				/*
+				** Left rotation (LR) function
+				** @param void void
+				** @return return the new root after being left rotated
+				*/
+				node *left_rotation()
+				{
+					node *new_root;
+
+					new_root = this->right;
+					/*
+					** In the next line, were pointing to the right left node in order to not lose access to it,
+					** since we're going to overide the left node in the next expression (new_root->left = root)
+					*/
+					this->right = new_root->left;
+					new_root->left = this;
+
+					if (this->right != NULL)
+						this->right->parent = this;
+					
+					new_root->parent = this->parent;
+					this->parent = new_root;
+
+
+					this->update_height(this->right);
+					this->update_height(this->left);
+					this->update_height(this);
+					this->update_height(new_root);
+
+					return (new_root);
+				}
+
+				/*
+				** Right rotation (RR) function
+				** @param void void
+				** @return return the new root after being right rotated
+				*/
+				node *right_rotation()
+				{
+					node *new_root;
+
+					new_root = this->left;
+					this->left = new_root->right;
+					new_root->right = this;
+
+					if (this->left)
+						this->left->parent = this;
+					
+					new_root->parent = this->parent;
+					this->parent = new_root;
+
+					this->update_height(this->right);
+					this->update_height(this->left);
+					this->update_height(this);
+					this->update_height(new_root);
+
+					return (new_root);
+				}
+
+				/*
+				** This function update the height of the node
+				** @param void void
+				** @return void
+				*/
+				void update_height(node *root)
+				{
+					size_type height;
+
+					if (!root || root->height == 0)
+						return ;
+
+					height = 0;
+					if (root->left)
+						height = root->left->height;
+					else if (root->right)
+						height = std::max(root->right->height, height);
+					
+					root->height = height + 1;
+				}
+
 			};
 		/* ============================== CONSTRUCTOR/DESTRUCTOR ============================== */
 		public:
@@ -139,65 +219,6 @@ namespace ft
 			}
 
 			/*
-			** Left rotation (LR) function
-			** @param root pointer to the root to be rotated
-			** @return return the new root after being left rotated
-			*/
-			node *left_rotation(node *root)
-			{
-				node *new_root;
-
-				new_root = root->right;
-				/*
-				** In the next line, were pointing to the right left node in order to not lose access to it,
-				** since we're going to overide the left node in the next expression (new_root->left = root)
-				*/
-				root->right = new_root->left;
-				new_root->left = root;
-
-				if (root->right != NULL)
-					root->right->parent = root;
-				
-				new_root->parent = root->parent;
-				root->parent = new_root;
-
-
-				this->update_height(root->right);
-				this->update_height(root->left);
-				this->update_height(root);
-				this->update_height(new_root);
-
-				return (new_root);
-			}
-
-			/*
-			** Right rotation (RR) function
-			** @param root pointer to the root to be rotated
-			** @return return the new root after being right rotated
-			*/
-			node *right_rotation(node *root)
-			{
-				node *new_root;
-
-				new_root = root->left;
-				root->left = new_root->right;
-				new_root->right = root;
-
-				if (root->left)
-					root->left->parent = root;
-				
-				new_root->parent = root->parent;
-				root->parent = new_root;
-
-				this->update_height(root->right);
-				this->update_height(root->left);
-				this->update_height(root);
-				this->update_height(new_root);
-
-				return (new_root);
-			}
-
-			/*
 			** Insert the value in the tree
 			** @param tree a tree pointing to the root object
 			** @param value value to be inserted in the tree
@@ -230,14 +251,14 @@ namespace ft
 						** then the new element will be inserted in the left as well
 						*/
 						if (value.first < root->left->get_key())
-							root = this->right_rotation(root);
+							root = root->right_rotation();
 						else
 						{
 							/*
 							** LEFT RIGHT CASE, since the new element is going to be inserted in the right side
 							*/
-							root->left = this->left_rotation(root->left);
-							root = this->right_rotation(root);
+							root->left = root->left->left_rotation();
+							root = root->right_rotation();
 						}
 					}
 					else
@@ -246,39 +267,18 @@ namespace ft
 						** RIGHT RIGHT CASE, Read the comment for the LEFT LEFT CASE and reverse it to understand this block
 						*/
 						if (value.first > root->right->get_key())
-							root = this->left_rotation(root);
+							root = root->left_rotation();
 						else
 						{
 							/*
 							** RIGHT LEFT CASE
 							*/
-							root->right = this->right_rotation(root->right);
-							root = this->left_rotation(root);
+							root->right = root->right->right_rotation();
+							root = root->left_rotation();
 						}						
 					}
 				}
 				return (root);
-			}
-
-			/*
-			** This function update the height of the node
-			** @param void void
-			** @return void
-			*/
-			void update_height(node *root)
-			{
-				size_type height;
-
-				if (!root || root->height == 0)
-					return ;
-
-				height = 0;
-				if (root->left)
-					height = root->left->height;
-				else if (root->right)
-					height = std::max(root->right->height, height);
-				
-				root->height = height + 1;
 			}
 
 			/*
