@@ -69,7 +69,7 @@ namespace ft
 				** @param void void
 				** @return return a reference to the value of the current node
 				*/
-				mapped_type &getvalue()
+				mapped_type &get_value()
 				{
 					return (this->value->second);
 				}
@@ -121,11 +121,25 @@ namespace ft
 				root->init();
 				root->value = this->_alloc.allocate(1);
 				this->_alloc.construct(root->value, value);
+				root->height = 1;
 				return (root);
 			}
 
 			/*
-			** Left rotation (LLF) function
+			**
+			*/
+			int	get_balance(node *root)
+			{
+				int balance;
+
+				balance = (root->left) ? root->left->height : 0;
+				balance -= (root->right) ? root->right->height : 0;
+
+				return (balance);
+			}
+
+			/*
+			** Left rotation (LR) function
 			** @param root pointer to the root to be rotated
 			** @return return the new root after being left rotated
 			*/
@@ -138,7 +152,7 @@ namespace ft
 				** In the next line, were pointing to the right left node in order to not lose access to it,
 				** since we're going to overide the left node in the next expression (new_root->left = root)
 				*/
-				root->right = root->right->left;
+				root->right = new_root->left;
 				new_root->left = root;
 
 				if (root->right != NULL)
@@ -151,7 +165,34 @@ namespace ft
 				this->update_height(root->right);
 				this->update_height(root->left);
 				this->update_height(root);
-				this->update_height(root->parent);
+				this->update_height(new_root);
+
+				return (new_root);
+			}
+
+			/*
+			** Right rotation (RR) function
+			** @param root pointer to the root to be rotated
+			** @return return the new root after being right rotated
+			*/
+			node *right_rotation(node *root)
+			{
+				node *new_root;
+
+				new_root = root->left;
+				root->left = new_root->right;
+				new_root->right = root;
+
+				if (root->left)
+					root->left->parent = root;
+				
+				new_root->parent = root->parent;
+				root->parent = new_root;
+
+				this->update_height(root->right);
+				this->update_height(root->left);
+				this->update_height(root);
+				this->update_height(new_root);
 
 				return (new_root);
 			}
@@ -162,17 +203,61 @@ namespace ft
 			** @param value value to be inserted in the tree
 			** @return the new root after inserting the new value
 			*/
-			node *insert(node *tree, value_type const value)
+			node *insert(node *root, node *parent, value_type const value)
 			{
-				if (!tree)
-					return (this->create_node(value));
-				if (tree->value->first == value.first)
-					tree->value->second = value.second;
-				else if (this->_compare(tree->value->first, value.first))
-					tree->right = this->insert(tree->right, value);
+				int balance;
+
+				if (!root)
+					root = this->create_node(value);
+				else if (root->value.first == value.first)
+					root->value->second = value.second;
+				else if (this->_compare(root->value->first, value.first))
+					root->right = this->insert(root->right, root, value);
 				else
-					tree->left = this->insert(tree->left, value);
-				return (tree);
+					root->left = this->insert(root->left, root, value);
+				balance = this->get_balance(root);
+
+				if (std::abs(balance) == 2)
+				{
+					/*
+					** Since the balance is negatif, that means the left height is bigget than the right height
+					** Which means we are in the LEFT CASE, we need just to check if it's LEFT LEFT CASE or LEFT RIGHT CASE
+					*/
+					if (balance > 0)
+					{
+						/*
+						** LEFT LEFT CASE, Since the left key of the root is bigger than the key,
+						** then the new element will be inserted in the left as well
+						*/
+						if (value.first < root->left->get_key())
+							root = this->right_rotation(root);
+						else
+						{
+							/*
+							** LEFT RIGHT CASE, since the new element is going to be inserted in the right side
+							*/
+							root->left = this->left_rotation(root->left);
+							root = this->right_rotation(root);
+						}
+					}
+					else
+					{
+						/*
+						** RIGHT RIGHT CASE, Read the comment for the LEFT LEFT CASE and reverse it to understand this block
+						*/
+						if (value.first > root->right->get_key())
+							root = this->left_rotation(root);
+						else
+						{
+							/*
+							** RIGHT LEFT CASE
+							*/
+							root->right = this->right_rotation(root->right);
+							root = this->left_rotation(root);
+						}						
+					}
+				}
+				return (root);
 			}
 
 			/*
