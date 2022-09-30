@@ -28,6 +28,53 @@ namespace ft
 			typedef size_t											size_type;
 			typedef Alloc											allocator_type;
 
+		/* ============================== MEMBER CLASS ============================== */
+		public:
+			struct node
+			{
+				/* =============== MEMBER ATTRIBUTES =============== */
+				node													*parent;
+				node													*left;
+				node													*right;
+
+				value_type												*value;
+				size_type												height;
+
+				/*
+				** Initialize the object
+				** @param void void
+				** @return void
+				*/
+				void init(void)
+				{
+					this->left = NULL;
+					this->right = NULL;
+					this->parent = NULL;
+					this->height = 0;
+					this->value = NULL;
+				}
+
+				/*
+				** Get the key of the current return
+				** @param void void
+				** @return return the key of the current node
+				*/
+				key_type get_key() const
+				{
+					return (this->value->first);
+				}
+
+				/*
+				** Get the value of the current return
+				** @param void void
+				** @return return a reference to the value of the current node
+				*/
+				mapped_type &getvalue()
+				{
+					return (this->value->second);
+				}
+
+			};
 		/* ============================== CONSTRUCTOR/DESTRUCTOR ============================== */
 		public:
 			/*
@@ -37,7 +84,7 @@ namespace ft
 			*/
 			AVL(void)
 			{
-				this->_init();
+				this->root = NULL;
 			}
 
 			/*
@@ -48,57 +95,33 @@ namespace ft
 			*/
 			AVL(key_type key, mapped_type value)
 			{
-				this->_init();
-				this->_alloc.construct(this->value, ft::make_pair(key, value));
+				this->root = this->_alloc_node.allocate(1);
+				this->root->init();
+				this->_alloc.construct(this->root->value, ft::make_pair(key, value));
 			}
 
 			~AVL()
 			{
-				this->_alloc.destroy(this->_value);
-				this->_alloc.deallocate(this->_value, 1);
+				// this->_alloc.destroy(this->_root);
+				// this->_alloc.deallocate(this->value, 1);
 			}
 
 		/* ============================== MEMBER FUNCTION ============================== */
 		public:
 			/*
-			** Get the key of the current return
-			** @param void void
-			** @return return the key of the current node
+			** Create a new node
+			** @param value the value that will inside the node
+			** @return the AVL object after being created
 			*/
-			key_type get_key() const
+			node *create_node(value_type const value)
 			{
-				return (this->_value->first);
-			}
+				node *root;
 
-			/*
-			** Get the value of the current return
-			** @param void void
-			** @return return a reference to the value of the current node
-			*/
-			mapped_type &get_value()
-			{
-				return (this->_value->second);
-			}
-
-			/*
-			** This function update the height of the node
-			** @param void void
-			** @return void
-			*/
-			void update_height(AVL *tree)
-			{
-				size_type height;
-
-				if (!tree || tree->_height == 0)
-					return ;
-
-				height = 0;
-				if (tree->_left)
-					height = tree->_left->_height;
-				else if (tree->_right)
-					height = std::max(tree->_right->_height, height);
-				
-				tree->_height = height + 1;
+				root = this->_alloc_node.allocate(1);
+				root->init();
+				root->value = this->_alloc.allocate(1);
+				this->_alloc.construct(root->value, value);
+				return (root);
 			}
 
 			/*
@@ -106,28 +129,29 @@ namespace ft
 			** @param root pointer to the root to be rotated
 			** @return return the new root after being left rotated
 			*/
-			struct AVL *left_rotation(struct AVL *root)
+			node *left_rotation(node *root)
 			{
-				struct AVL *new_root;
+				node *new_root;
 
-				new_root = root->_right;
+				new_root = root->right;
 				/*
 				** In the next line, were pointing to the right left node in order to not lose access to it,
 				** since we're going to overide the left node in the next expression (new_root->left = root)
 				*/
-				root->_right = root->_right->_left;
-				new_root->_left = root;
+				root->right = root->right->left;
+				new_root->left = root;
 
-				if (root->_right != NULL)
-					root->_right->_parent = root;
+				if (root->right != NULL)
+					root->right->parent = root;
 				
-				new_root->_parent = root->_parent;
-				root->_parent = new_root;
+				new_root->parent = root->parent;
+				root->parent = new_root;
 
-				this->update_height(root->_right);
-				this->update_height(root->_left);
+
+				this->update_height(root->right);
+				this->update_height(root->left);
 				this->update_height(root);
-				this->update_height(root->_parent);
+				this->update_height(root->parent);
 
 				return (new_root);
 			}
@@ -138,33 +162,38 @@ namespace ft
 			** @param value value to be inserted in the tree
 			** @return the new root after inserting the new value
 			*/
-			AVL *insert(AVL *tree, value_type const value)
+			node *insert(node *tree, value_type const value)
 			{
 				if (!tree)
-					return (this->create(value));
-				if (tree->_value->first == value.first)
-					tree->_value->second = value.second;
-				else if (this->_compare(tree->_value->first, value.first))
-					tree->_right = this->insert(tree->_right, value);
+					return (this->create_node(value));
+				if (tree->value->first == value.first)
+					tree->value->second = value.second;
+				else if (this->_compare(tree->value->first, value.first))
+					tree->right = this->insert(tree->right, value);
 				else
-					tree->_left = this->insert(tree->_left, value);
+					tree->left = this->insert(tree->left, value);
 				return (tree);
 			}
 
 			/*
-			** Create a new node
-			** @param value the value that will inside the node
-			** @return the AVL object after being created
+			** This function update the height of the node
+			** @param void void
+			** @return void
 			*/
-			AVL *create(value_type const value)
+			void update_height(node *root)
 			{
-				AVL *root;
+				size_type height;
 
-				root = this->_alloc_avl.allocate(1);
-				root->_init();
-				root->_value = this->_alloc.allocate(1);
-				this->_alloc.construct(root->_value, value);
-				return (root);
+				if (!root || root->height == 0)
+					return ;
+
+				height = 0;
+				if (root->left)
+					height = root->left->height;
+				else if (root->right)
+					height = std::max(root->right->height, height);
+				
+				root->height = height + 1;
 			}
 
 			/*
@@ -172,53 +201,36 @@ namespace ft
 			** @param tree tree to print
 			** @return void
 			*/
-			void print(AVL *tree)
+			void print(node *tree)
 			{
 				if (!tree)
 					return ;
 				std::cout << "LEFT = ";
-				if (tree->_left && tree->_left->_value)
-					std::cout << '(' << tree->_left->_value->first << ',' << tree->_left->_value->second << ')';
+				if (tree->left && tree->left->value)
+					std::cout << '(' << tree->left->value->first << ',' << tree->left->value->second << ')';
 				else
 					std::cout << "(NULL)";
 				std::cout << "\t|\t";
-				std::cout << '(' << tree->_value->first << ',' << tree->_value->second << ')';
+				std::cout << '(' << tree->value->first << ',' << tree->value->second << ')';
 				std::cout << "\t|\t";
 				std::cout << "RIGHT = ";
-				if (tree->_right && tree->_right->_value)
-					std::cout << '(' << tree->_right->_value->first << ',' << tree->_right->_value->second << ')';
+				if (tree->right && tree->right->value)
+					std::cout << '(' << tree->right->value->first << ',' << tree->right->value->second << ')';
 				else
 					std::cout << "(NULL)";
 				std::cout << std::endl;
-				print(tree->_left);
-				print(tree->_right);
-			}
-
-		private:
-			/*
-			** Initialize the object
-			** @param void void
-			** @return void
-			*/
-			void _init(void)
-			{
-				this->_left = NULL;
-				this->_right = NULL;
-				this->_parent = NULL;
-				this->_height = 0;
+				print(tree->left);
+				print(tree->right);
 			}
 
 		/* ============================== MEMBER ATTRIBUTES ============================== */
 		public:
-			AVL														*_parent;
-			AVL														*_left;
-			AVL														*_right;
-
-			value_type												*_value;
-			size_type												_height;
+			node													*root;
+		
+		private:
 			allocator_type											_alloc;
+			typename allocator_type::template rebind<node>::other	_alloc_node;
 			Compare													_compare;
-			typename allocator_type::template rebind<AVL>::other	_alloc_avl;
 	};
 
 };
