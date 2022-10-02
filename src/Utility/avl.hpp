@@ -259,10 +259,7 @@ namespace ft
 					** then the new element will be inserted in the left as well
 					*/
 					if (this->get_balance(root->left) > 0)
-					{
-						std::cout << "LEFT LEFT CASE" << std::endl;
 						root = root->right_rotation();
-					}
 					else
 					{
 						/*
@@ -270,7 +267,6 @@ namespace ft
 						*/
 						root->left = root->left->left_rotation();
 						root = root->right_rotation();
-						std::cout << "LEFT RIGHT CASE" << std::endl;
 					}
 				}
 				else
@@ -279,24 +275,16 @@ namespace ft
 					** RIGHT RIGHT CASE, Read the comment for the LEFT LEFT CASE and reverse it to understand this block
 					*/
 					if (this->get_balance(root->right) < 0)
-					{
 						root = root->left_rotation();
-						std::cout << "RIGHT RIGHT CASE" << std::endl;
-					}
+					/*
+					** RIGHT LEFT CASE
+					*/
 					else
 					{
-						/*
-						** RIGHT LEFT CASE
-						*/
 						root->right = root->right->right_rotation();
 						root = root->left_rotation();
-						std::cout << "RIGHT LEFT CASE" << std::endl;
 					}						
 				}
-				std::cout << "ROOT: " << root->get_key();
-				if (root->parent)
-					std::cout << " - PARENT: " << (root->parent->get_key());
-				std::cout  << std::endl;
 			return (root);
 			}
 
@@ -418,6 +406,13 @@ namespace ft
 				return (root);
 			}
 
+			/*
+			**
+			*/
+			node *search(key_type key)
+			{
+
+			}
 			/*
 			** Print the tree
 			** @param tree tree to print
