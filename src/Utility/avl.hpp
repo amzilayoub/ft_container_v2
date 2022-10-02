@@ -98,10 +98,10 @@ namespace ft
 					this->parent = new_root;
 
 
-					this->update_height(this->right);
-					this->update_height(this->left);
-					this->update_height(this);
-					this->update_height(new_root);
+					this->right->update_height();
+					this->left->update_height();
+					this->update_height();
+					new_root->update_height();
 
 					return (new_root);
 				}
@@ -125,17 +125,17 @@ namespace ft
 					new_root->parent = this->parent;
 					this->parent = new_root;
 
-					this->update_height(this->right);
-					this->update_height(this->left);
-					this->update_height(this);
-					this->update_height(new_root);
+					this->right->update_height();
+					this->left->update_height();
+					this->update_height();
+					new_root->update_height();
 
 					return (new_root);
 				}
 
 				/*
 				** This function update the height of the node
-				** @param void void
+				** @param root targeted subtree
 				** @return void
 				*/
 				void update_height(node *root)
@@ -152,6 +152,37 @@ namespace ft
 						height = std::max(root->right->height, height);
 					
 					root->height = height + 1;
+				}
+
+				/*
+				** This function update the height of the node
+				** @param void void
+				** @return void
+				*/
+				void update_height()
+				{
+					return (this->update_height(this));
+				}
+
+				/*
+				** take a node and search in the left side to get the smallest key
+				** @param root the targeted tree/sub tree
+				** @return return the smallest node
+				*/
+				node *minimum_node(node *root)
+				{
+					if (root && root->left)
+						return (root->left);
+					return (root);
+				}
+
+				/*
+				** take a node and search in the left side to get the smallest key
+				** @return return the smallest node
+				*/
+				node *minimum_node()
+				{
+					return (this->minimum_node(this));
 				}
 			};
 		/* ============================== CONSTRUCTOR/DESTRUCTOR ============================== */
@@ -205,7 +236,73 @@ namespace ft
 			}
 
 			/*
-			**
+			** Balance the tree
+			** @param node the targeted node
+			** return the node after being balanced
+			*/
+			node *balance_tree(node *root, value_type value)
+			{
+				int balance;
+
+				balance = this->get_balance(root);
+				if (std::abs(balance) != 2)
+					return (root);
+				/*
+				** Since the balance is negatif, that means the left height is bigget than the right height
+				** Which means we are in the LEFT CASE, we need just to check if it's LEFT LEFT CASE or LEFT RIGHT CASE
+				*/
+				if (balance > 0)
+				{
+					/*
+					** LEFT LEFT CASE, Since the left key of the root is bigger than the key,
+					** then the new element will be inserted in the left as well
+					*/
+					if (value.first < root->left->get_key())
+					{
+						std::cout << "LEFT LEFT CASE" << std::endl;
+						root = root->right_rotation();
+					}
+					else
+					{
+						/*
+						** LEFT RIGHT CASE, since the new element is going to be inserted in the right side
+						*/
+						root->left = root->left->left_rotation();
+						root = root->right_rotation();
+						std::cout << "LEFT RIGHT CASE" << std::endl;
+					}
+				}
+				else
+				{
+					/*
+					** RIGHT RIGHT CASE, Read the comment for the LEFT LEFT CASE and reverse it to understand this block
+					*/
+					if (value.first > root->right->get_key())
+					{
+						root = root->left_rotation();
+						std::cout << "RIGHT RIGHT CASE" << std::endl;
+					}
+					else
+					{
+						/*
+						** RIGHT LEFT CASE
+						*/
+						root->right = root->right->right_rotation();
+						root = root->left_rotation();
+						std::cout << "RIGHT LEFT CASE" << std::endl;
+					}						
+				}
+				std::cout << "ROOT: " << root->get_key();
+				if (root->parent)
+					std::cout << " - PARENT: " << (root->parent->get_key());
+				std::cout  << std::endl;
+			return (root);
+			}
+
+			/*
+			** Get the difference in height between left and right
+			** @param root targeted node to get the balance
+			** @return positive integer if left height is bigger than the right, otherwise, positive, or zero in case they are equal
 			*/
 			int	get_balance(node *root)
 			{
@@ -247,61 +344,79 @@ namespace ft
 					root->right = this->insert(root->right, root, value);
 				else
 					root->left = this->insert(root->left, root, value);
-				balance = this->get_balance(root);
 
-				if (std::abs(balance) == 2)
+				root = this->balance_tree(root, value);
+				root->update_height();
+				return (root);
+			}
+
+			/*
+			** Delete a noce
+			** @param root targeted tree
+			** @param key targeted key
+			** @return returning the tree after deleting the targeted key
+			*/
+			node *delete_node(node *root, key_type key)
+			{
+				if (!root)
+					return (root);
+				
+				/*
+				** Targeted key has been found
+				*/
+				if (root->get_key() == key)
 				{
+					node *tmp;
+
+					tmp = NULL;
+					if (!root->left || !root->right)
+						tmp = (root->left) ? root->left : root->right;
+
 					/*
-					** Since the balance is negatif, that means the left height is bigget than the right height
-					** Which means we are in the LEFT CASE, we need just to check if it's LEFT LEFT CASE or LEFT RIGHT CASE
+					** At least there's a child, left or right
 					*/
-					if (balance > 0)
+					if (tmp != NULL)
 					{
-						/*
-						** LEFT LEFT CASE, Since the left key of the root is bigger than the key,
-						** then the new element will be inserted in the left as well
-						*/
-						if (value.first < root->left->get_key())
-						{
-							std::cout << "LEFT LEFT CASE" << std::endl;
-							root = root->right_rotation();
-						}
+						tmp = root->right->minimum_node();
+						if (tmp == root->right)
+							tmp->parent->right = NULL;
 						else
-						{
-							/*
-							** LEFT RIGHT CASE, since the new element is going to be inserted in the right side
-							*/
-							root->left = root->left->left_rotation();
-							root = root->right_rotation();
-							std::cout << "LEFT RIGHT CASE" << std::endl;
-						}
-					}
-					else
-					{
+							tmp->parent->left = NULL;
+						tmp->parent = root->parent;
+						tmp->left = root->left;
+						tmp->right = root->right;
 						/*
-						** RIGHT RIGHT CASE, Read the comment for the LEFT LEFT CASE and reverse it to understand this block
+						** Normally, we should connect the parent to the new node (tmp),
+						** but since we are calling the functions in recursive way, the parent left or right,
+						** will be replaced manually by one the next if else block
+						** which is root->right = this->delete_node(...) or root->left = ...
 						*/
-						if (value.first > root->right->get_key())
-						{
-							root = root->left_rotation();
-							std::cout << "RIGHT RIGHT CASE" << std::endl;
-						}
-						else
-						{
-							/*
-							** RIGHT LEFT CASE
-							*/
-							root->right = root->right->right_rotation();
-							root = root->left_rotation();
-							std::cout << "RIGHT LEFT CASE" << std::endl;
-						}						
 					}
-					std::cout << "ROOT: " << root->get_key();
-					if (root->parent)
-						std::cout << " - PARENT: " << (root->parent->get_key());
-					std::cout  << std::endl;
+					this->_alloc.destroy(root->value);
+					this->_alloc.deallocate(root->value, 1);
+					this->_alloc_node.deallocate(root, 1);
+
+					root = tmp;
 				}
-				root->update_height(root);
+				/*
+				** Search on the right
+				*/
+				else if (this->_compare(root->get_key(), key))
+					root->right = this->delete_node(root->right, key);
+				/*
+				** Search on the left
+				*/
+				else
+					root->left = this->delete_node(root->left, key);
+
+				/*
+				** if the tree has only one node, which means no left or right,
+				** then return it
+				*/
+				if (root == NULL)
+					return (root);
+				root->update_height();
+				this->balance_tree(root);
 				return (root);
 			}
 

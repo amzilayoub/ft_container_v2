@@ -29,10 +29,10 @@ int main()
 	tree.root = tree.insert(tree.root, ft::make_pair(20, 10));
 	tree.root = tree.insert(tree.root, ft::make_pair(2, 10));
 
-	std::cout << "==========" << std::endl;
-	tree.print(tree.root);
-	std::cout << "==========" << std::endl;
 	tree.root = tree.insert(tree.root, ft::make_pair(3, 10));
-	std::cout << "==========" << std::endl;
 	tree.print(tree.root);
+	std::cout << "==========" << std::endl;
+	tree.delete_node(tree.root, 10);
+	tree.print(tree.root);
+
 }
