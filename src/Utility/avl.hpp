@@ -223,7 +223,7 @@ namespace ft
 			** @param value the value that will inside the node
 			** @return the AVL object after being created
 			*/
-			node *create_node(value_type const value)
+			node *create_node(value_type const value, node *parent = NULL)
 			{
 				node *root;
 
@@ -232,6 +232,7 @@ namespace ft
 				root->value = this->_alloc.allocate(1);
 				this->_alloc.construct(root->value, value);
 				root->height = 1;
+				root->parent = parent;
 				return (root);
 			}
 
@@ -240,7 +241,7 @@ namespace ft
 			** @param node the targeted node
 			** return the node after being balanced
 			*/
-			node *balance_tree(node *root, value_type value)
+			node *balance_tree(node *root)
 			{
 				int balance;
 
@@ -257,7 +258,7 @@ namespace ft
 					** LEFT LEFT CASE, Since the left key of the root is bigger than the key,
 					** then the new element will be inserted in the left as well
 					*/
-					if (value.first < root->left->get_key())
+					if (this->get_balance(root->left) > 0)
 					{
 						std::cout << "LEFT LEFT CASE" << std::endl;
 						root = root->right_rotation();
@@ -277,7 +278,7 @@ namespace ft
 					/*
 					** RIGHT RIGHT CASE, Read the comment for the LEFT LEFT CASE and reverse it to understand this block
 					*/
-					if (value.first > root->right->get_key())
+					if (this->get_balance(root->right) < 0)
 					{
 						root = root->left_rotation();
 						std::cout << "RIGHT RIGHT CASE" << std::endl;
@@ -337,7 +338,7 @@ namespace ft
 				int balance;
 
 				if (!root)
-					root = this->create_node(value);
+					root = this->create_node(value, parent);
 				else if (root->get_key() == value.first)
 					root->value->second = value.second;
 				else if (this->_compare(root->value->first, value.first))
@@ -345,7 +346,7 @@ namespace ft
 				else
 					root->left = this->insert(root->left, root, value);
 
-				root = this->balance_tree(root, value);
+				root = this->balance_tree(root);
 				root->update_height();
 				return (root);
 			}
@@ -369,13 +370,10 @@ namespace ft
 					node *tmp;
 
 					tmp = NULL;
-					if (!root->left || !root->right)
-						tmp = (root->left) ? root->left : root->right;
-
 					/*
 					** At least there's a child, left or right
 					*/
-					if (tmp != NULL)
+					if (root->left || root->right)
 					{
 						tmp = root->right->minimum_node();
 						if (tmp == root->right)
@@ -416,7 +414,7 @@ namespace ft
 				if (root == NULL)
 					return (root);
 				root->update_height();
-				this->balance_tree(root);
+				root = this->balance_tree(root);
 				return (root);
 			}
 

@@ -32,7 +32,6 @@ int main()
 	tree.root = tree.insert(tree.root, ft::make_pair(3, 10));
 	tree.print(tree.root);
 	std::cout << "==========" << std::endl;
-	tree.delete_node(tree.root, 10);
+	tree.root = tree.delete_node(tree.root, 20);
 	tree.print(tree.root);
-
 }
