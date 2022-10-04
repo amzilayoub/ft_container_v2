@@ -1,6 +1,7 @@
 
 # include "src/containers/vector.hpp"
 # include "src/containers/stack.hpp"
+# include "src/containers/map.hpp"
 # include <iostream>
 # include "src/Utility/algorithms.hpp"
 # include "src/Utility/avl.hpp"
@@ -11,6 +12,7 @@
 # include <vector>
 #include <sys/time.h>
 # include <map>
+# include "src/containers/map.hpp"
 
 time_t get_time(void)
 {
@@ -23,15 +25,31 @@ time_t get_time(void)
 
 int main()
 {
-    ft::AVL<int, int> tree;
-	tree.root = tree.insert(tree.root, ft::make_pair(10, 10));
-	tree.root = tree.insert(tree.root, ft::make_pair(5, 10));
-	tree.root = tree.insert(tree.root, ft::make_pair(20, 10));
-	tree.root = tree.insert(tree.root, ft::make_pair(2, 10));
+	ft::map<int, int> tree;
 
-	tree.root = tree.insert(tree.root, ft::make_pair(3, 10));
-	tree.print(tree.root);
+
+	for (int i = 1; i <= 10; i++)
+		tree.insert(ft::make_pair(i, i * 10));
+	for (int i = -10; i < 0; i++)
+		tree.insert(ft::make_pair(i, i * 10));
+
+
+	ft::map<int, int>::iterator it = tree.begin();
+
+
+	for (; it != tree.end();)
+	{
+		std::cout << it->first << " | " << it->second << std::endl;
+		++it;
+	}
+
 	std::cout << "==========" << std::endl;
-	tree.root = tree.delete_node(tree.root, 20);
-	tree.print(tree.root);
+
+
+	it = tree.end();
+	for (; it != tree.begin();)
+	{
+		--it;
+		std::cout << it->first << " | " << it->second << std::endl;
+	}
 }

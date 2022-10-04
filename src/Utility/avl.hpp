@@ -8,6 +8,7 @@
 # include "./utility.hpp"
 # include <algorithm>
 # include <functional>
+# include <iostream>
 
 namespace ft
 {
@@ -32,6 +33,14 @@ namespace ft
 		public:
 			struct node
 			{
+				/* =============== MEMBER TYPE =============== */
+				/*
+				** redefining these members as we will need them in the biderectional iterator
+				*/
+				typedef value_type										value_type;
+				typedef key_type										key_type;
+				typedef mapped_type										mapped_type;
+				
 				/* =============== MEMBER ATTRIBUTES =============== */
 				node													*parent;
 				node													*left;
@@ -40,6 +49,7 @@ namespace ft
 				value_type												*value;
 				size_type												height;
 
+				/* =============== MEMBER FUNCTIONS =============== */
 				/*
 				** Initialize the object
 				** @param void void
@@ -172,17 +182,71 @@ namespace ft
 				node *minimum_node(node *root)
 				{
 					if (root && root->left)
-						return (root->left);
+						return (root->left->minimum_node());
 					return (root);
 				}
 
 				/*
 				** take a node and search in the left side to get the smallest key
+				** @param void void
 				** @return return the smallest node
 				*/
 				node *minimum_node()
 				{
 					return (this->minimum_node(this));
+				}
+				
+				/*
+				** take a node and search in the right side to get the biggest key
+				** @param root the targeted tree/sub tree
+				** @return return the biggest node
+				*/
+				node *maximum_node(node *root)
+				{
+					if (root && root->right)
+						return (root->right->maximum_node());
+					return (root);
+				}
+
+				/*
+				** take a node and search in the left side to get the smallest key
+				** @param void void
+				** @return return the smallest node
+				*/
+				node *maximum_node()
+				{
+					return (this->maximum_node(this));
+				}
+
+				value_type &operator*() const
+				{
+					return (*(this->value));
+				}
+
+				node	*operator++()
+				{
+					node *cur;
+
+					cur = this;
+					if (cur->right)
+						return (cur->right->minimum_node());
+
+					while (cur->parent && cur->parent->right == cur)
+						cur = cur->parent;
+					return (cur->parent);
+				}
+
+				node	*operator--()
+				{
+					node *cur;
+
+					cur = this;
+					if (cur->left)
+						return (cur->left->maximum_node());
+
+					while (cur->parent && cur->parent->left == cur)
+						cur = cur->parent;
+					return (cur->parent);
 				}
 			};
 		/* ============================== CONSTRUCTOR/DESTRUCTOR ============================== */
@@ -194,20 +258,13 @@ namespace ft
 			*/
 			AVL(void)
 			{
+				/*
+				** this is the last element in the tree, which should be retourned by the end() function in the ::map
+				*/
+				this->root_parent = this->_alloc_node.allocate(1);
+				this->root_parent->init();
+				this->root_parent->left = this->root;
 				this->root = NULL;
-			}
-
-			/*
-			** Construct a node from a key value
-			** @param key key inserted
-			** @param value the value associated
-			** @Return void
-			*/
-			AVL(key_type key, mapped_type value)
-			{
-				this->root = this->_alloc_node.allocate(1);
-				this->root->init();
-				this->_alloc.construct(this->root->value, ft::make_pair(key, value));
 			}
 
 			~AVL()
@@ -305,13 +362,15 @@ namespace ft
 
 			/*
 			** Insert the value in the tree
-			** @param tree a tree pointing to the root object
 			** @param value value to be inserted in the tree
 			** @return the new root after inserting the new value
 			*/
-			node *insert(node *root, value_type const value)
+			node *insert(value_type const value)
 			{
-				return (this->insert(root, NULL, value));
+				this->root = this->insert(this->root, this->root_parent, value);
+
+				this->root_parent->left = this->root;
+				return (this->root);
 			}
 
 			/*
@@ -337,6 +396,18 @@ namespace ft
 				root = this->balance_tree(root);
 				root->update_height();
 				return (root);
+			}
+
+			/*
+			** Delete a noce
+			** @param key targeted key
+			** @return returning the tree after deleting the targeted key
+			*/
+			node *delete_node(key_type key)
+			{
+				this->root = this->delete_node(this->root, key);
+
+				return (this->root);
 			}
 
 			/*
@@ -407,12 +478,33 @@ namespace ft
 			}
 
 			/*
-			**
+			** search for a specific key inside the tree
+			** @param key the needle
+			** @return return the node that contains that key, otherwise NULL
 			*/
 			node *search(key_type key)
 			{
-
+				return (this->search(this->root, key));
 			}
+
+			/*
+			** search for a specific key inside the tree
+			** @param root subtree to search at
+			** @param key the needle
+			** @return return the node that contains that key, otherwise NULL
+			*/
+			node *search(node *root, key_type key)
+			{
+				if (root == NULL)
+					return (root);
+				else if (root->get_key() == key)
+					return (root);
+				else if (this->_compare(root->get_key(), key))
+					return (this->search(root->right, key));
+				else
+					return (this->search(root->left, key));
+			}
+
 			/*
 			** Print the tree
 			** @param tree tree to print
@@ -440,9 +532,64 @@ namespace ft
 				print(tree->right);
 			}
 
+			/*
+			** take a node and clear all the subtree
+			** @param root the targeted tree/sub tree
+			** @return void
+			*/
+			node *clear(node *root)
+			{
+				if (root->left)
+					root->left->clear();
+				if (root->right)
+					root->right->clear();
+				this->_alloc.destroy(root->value);
+				this->_alloc.deallocate(root->value);
+				this->_alloc_node.destroy(root);
+				this->_alloc_node.deallocate(root);
+
+				return (NULL);
+			}
+
+			/*
+			** take a node and clear all the subtree
+			** @param void void
+			** @return void
+			*/
+			node* clear()
+			{
+				this->root = this->clear(this->root);
+			}
+
+			/*
+			** take a node and insert all it's alement into the root of the current object
+			** @param node the targeted node to be copied
+			** @return void void
+			*/
+			void copy_tree(const node *rhs)
+			{
+				if (rhs->right)
+					this->copy_tree(rhs->right);
+				if (rhs->left)
+					this->copy_tree(rhs->left);
+				this->insert(rhs->value);
+			}
+
+			AVL& operator= (const AVL& rhs)
+			{
+				this->clear();
+				this->_alloc = rhs._alloc;
+				this->_alloc_node = rhs._alloc_node;
+				this->_compare = rhs._compare;
+				this->copy_tree(rhs.tree);
+
+				return (*this);
+			}
+
 		/* ============================== MEMBER ATTRIBUTES ============================== */
 		public:
 			node													*root;
+			node													*root_parent;
 		
 		private:
 			allocator_type											_alloc;
