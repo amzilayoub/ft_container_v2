@@ -27,17 +27,19 @@ int main()
 {
 	ft::map<int, int> tree;
 
-
+	tree[80];
 	for (int i = 1; i <= 10; i++)
 		tree.insert(ft::make_pair(i, i * 10));
+
+
+	ft::map<int, int> tree1(tree.begin(), tree.end());
+
 	for (int i = -10; i < 0; i++)
 		tree.insert(ft::make_pair(i, i * 10));
 
-
-	ft::map<int, int>::iterator it = tree.begin();
-
-
-	for (; it != tree.end();)
+	// tree1 = tree;
+	ft::map<int, int>::iterator it = tree1.begin();
+	for (; it != tree1.end();)
 	{
 		std::cout << it->first << " | " << it->second << std::endl;
 		++it;

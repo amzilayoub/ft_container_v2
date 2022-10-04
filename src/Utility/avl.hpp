@@ -258,9 +258,6 @@ namespace ft
 			*/
 			AVL(void)
 			{
-				/*
-				** this is the last element in the tree, which should be retourned by the end() function in the ::map
-				*/
 				this->root_parent = this->_alloc_node.allocate(1);
 				this->root_parent->init();
 				this->root_parent->left = this->root;
@@ -540,13 +537,13 @@ namespace ft
 			node *clear(node *root)
 			{
 				if (root->left)
-					root->left->clear();
+					root->left = this->clear(root->left);
 				if (root->right)
-					root->right->clear();
+					root->right = this->clear(root->right);
 				this->_alloc.destroy(root->value);
-				this->_alloc.deallocate(root->value);
+				this->_alloc.deallocate(root->value, 1);
 				this->_alloc_node.destroy(root);
-				this->_alloc_node.deallocate(root);
+				this->_alloc_node.deallocate(root, 1);
 
 				return (NULL);
 			}
@@ -556,7 +553,7 @@ namespace ft
 			** @param void void
 			** @return void
 			*/
-			node* clear()
+			void clear()
 			{
 				this->root = this->clear(this->root);
 			}
@@ -572,7 +569,7 @@ namespace ft
 					this->copy_tree(rhs->right);
 				if (rhs->left)
 					this->copy_tree(rhs->left);
-				this->insert(rhs->value);
+				this->insert(*(rhs->value));
 			}
 
 			AVL& operator= (const AVL& rhs)
@@ -581,7 +578,7 @@ namespace ft
 				this->_alloc = rhs._alloc;
 				this->_alloc_node = rhs._alloc_node;
 				this->_compare = rhs._compare;
-				this->copy_tree(rhs.tree);
+				this->copy_tree(rhs.root);
 
 				return (*this);
 			}
@@ -589,6 +586,9 @@ namespace ft
 		/* ============================== MEMBER ATTRIBUTES ============================== */
 		public:
 			node													*root;
+			/*
+			** this is the last element in the tree, which should be retourned by the end() function in the ::map
+			*/
 			node													*root_parent;
 		
 		private:

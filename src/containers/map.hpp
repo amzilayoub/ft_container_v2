@@ -123,69 +123,6 @@ class map
 		{
 			(*this) = x;
 		}
-
-	/* ============================== MEMBER FUNCTIONS ============================== */
-	public:
-		/* =================== */
-		/* ==== MODIFIERS ==== */
-		/* =================== */
-		/*
-		** Insert elements
-		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
-		** Because element keys in a map are unique, the insertion operation checks whether each inserted
-		** element has a key equivalent to the one of an element already in the container,
-		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
-		** For a similar container allowing for duplicate elements, see multimap.
-		** An alternative way to insert elements in a map is by using member function map::operator[].
-		** Internally, map containers keep all their elements sorted by their key following the criterion
-		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
-		** @param val Value to be copied to (or moved as) the inserted element.
-		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
-		*/
-		pair<iterator,bool> insert (const value_type& val)
-		{
-			return (this->_insert(val));
-		}
-
-		/*
-		** Insert elements
-		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
-		** Because element keys in a map are unique, the insertion operation checks whether each inserted
-		** element has a key equivalent to the one of an element already in the container,
-		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
-		** For a similar container allowing for duplicate elements, see multimap.
-		** An alternative way to insert elements in a map is by using member function map::operator[].
-		** Internally, map containers keep all their elements sorted by their key following the criterion
-		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
-		** @param position Hint for the position where the element can be inserted.
-		** @param val Value to be copied to (or moved as) the inserted element.
-		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
-		*/
-		iterator insert (iterator position, const value_type& val)
-		{
-			return (this->_insert(val, &position).first);
-		}
-
-		/*
-		** Insert elements
-		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
-		** Because element keys in a map are unique, the insertion operation checks whether each inserted
-		** element has a key equivalent to the one of an element already in the container,
-		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
-		** For a similar container allowing for duplicate elements, see multimap.
-		** An alternative way to insert elements in a map is by using member function map::operator[].
-		** Internally, map containers keep all their elements sorted by their key following the criterion
-		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
-		** @param first Input iterators to the initial positions in a range.
-		** @param last Input iterators to the final positions in a range.
-		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
-		*/
-		template <class InputIterator>
-		void insert (InputIterator first, InputIterator last)
-		{
-			while (first != last)
-				this->insert(*(first++));
-		}
 		
 	/* ============================== MEMBER FUNCTIONS ============================== */
 	public:
@@ -239,6 +176,19 @@ class map
 				return (iterator(this->_tree.root_parent));
 			return (iterator(this->_tree.root));
 		}
+		
+		/*
+		** Return iterator to end
+		** Returns an iterator referring to the past-the-end element in the map container.
+		** The past-the-end element is the theoretical element that would follow the last
+		** element in the map container. It does not point to any element, and thus shall not be dereferenced.
+		** Because the ranges used by functions of the standard library
+		** do not include the element pointed by their closing iterator,
+		** this function is often used in combination with map::begin to specify a range including all the elements in the container.
+		** If the container is empty, this function returns the same as map::begin.
+		** @param void void
+		** @param An iterator to the past-the-end element in the container. 
+		*/
 		const_iterator end() const
 		{
 			/*
@@ -248,6 +198,189 @@ class map
 				return (const_iterator(this->_tree.root_parent));
 			return (const_iterator(this->_tree.root));
 		}
+
+		/*
+		** Return reverse iterator to reverse beginning
+		** Returns a reverse iterator pointing to the last element in the container (i.e., its reverse beginning).
+		** Reverse iterators iterate backwards: increasing them moves them towards the beginning of the container.
+		** rbegin points to the element preceding the one that would be pointed to by member end.
+		** @param void void
+		** @return A reverse iterator to the reverse beginning of the sequence container.
+		*/
+		reverse_iterator rbegin()
+		{
+			return (reverse_iterator(this->end()));
+		}
+
+		/*
+		** Return reverse iterator to reverse beginning
+		** Returns a reverse iterator pointing to the last element in the container (i.e., its reverse beginning).
+		** Reverse iterators iterate backwards: increasing them moves them towards the beginning of the container.
+		** rbegin points to the element preceding the one that would be pointed to by member end.
+		** @param void void
+		** @return A reverse iterator to the reverse beginning of the sequence container.
+		*/
+		const_reverse_iterator rbegin() const
+		{
+			return (const_reverse_iterator(this->end()));
+		}
+
+		/*
+		** Return reverse iterator to reverse end
+		** Returns a reverse iterator pointing to the theoretical element right before
+		** the first element in the map container (which is considered its reverse end).
+		** The range between map::rbegin and map::rend contains all the elements of the container (in reverse order).
+		** @param void void
+		** @return A reverse iterator to the reverse end of the sequence container.
+		*/
+		reverse_iterator rend()
+		{
+			return (reverse_iterator(this->begin()));
+		}
+
+		/*
+		** Return reverse iterator to reverse end
+		** Returns a reverse iterator pointing to the theoretical element right before
+		** the first element in the map container (which is considered its reverse end).
+		** The range between map::rbegin and map::rend contains all the elements of the container (in reverse order).
+		** @param void void
+		** @return A reverse iterator to the reverse end of the sequence container.
+		*/
+		const_reverse_iterator rend() const
+		{
+			return (const_reverse_iterator(this->begin()));
+		}
+
+		/* ================== */
+		/* ==== CAPACITY ==== */
+		/* ================== */
+		/*
+		** Test whether container is empty
+		** Returns whether the map container is empty (i.e. whether its size is 0).
+		** This function does not modify the container in any way. To clear the content of a map container, see map::clear.
+		** @param void void
+		** @return true if the container size is 0, false otherwise.
+		*/
+		bool empty() const
+		{
+			return (this->_size == 0);
+		}
+
+		/*
+		** Return container size
+		** Returns the number of elements in the map container.
+		** @param void void
+		** @return The number of elements in the container.
+		*/
+		size_type size() const
+		{
+			return (this->_size);
+		}
+
+		/*
+		** Return maximum size
+		** Returns the maximum number of elements that the map container can hold.
+		** This is the maximum potential size the container can reach
+		** due to known system or library implementation limitations,
+		** but the container is by no means guaranteed to be able to reach that size:
+		** it can still fail to allocate storage at any point before that size is reached.
+		** @param void void
+		** @return The maximum number of elements a map container can hold as content.
+		*/
+		size_type max_size() const
+		{
+			return (this->_alloc.max_size());
+		}
+
+		/* ======================== */
+		/* ==== ELEMENT ACCESS ==== */
+		/* ======================== */
+		/*
+		** Access element
+		** If k matches the key of an element in the container, the function returns a reference to its mapped value.
+		** If k does not match the key of any element in the container,
+		** the function inserts a new element with that key and returns a reference to its mapped value.
+		** Notice that this always increases the container size by one, even if no mapped
+		** value is assigned to the element (the element is constructed using its default constructor).
+		** A similar member function, map::at, has the same behavior when an element with the key exists,
+		** but throws an exception when it does not.
+		** @param k Key value of the element whose mapped value is accessed.
+		** @return A reference to the mapped value of the element with a key value equivalent to k.
+		*/
+		mapped_type& operator[] (const key_type& k)
+		{
+			return ((*((this->insert(make_pair(k, mapped_type()))).first)).second);
+		}
+
+		/* =================== */
+		/* ==== MODIFIERS ==== */
+		/* =================== */
+		/*
+		** Insert elements
+		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
+		** Because element keys in a map are unique, the insertion operation checks whether each inserted
+		** element has a key equivalent to the one of an element already in the container,
+		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
+		** For a similar container allowing for duplicate elements, see multimap.
+		** An alternative way to insert elements in a map is by using member function map::operator[].
+		** Internally, map containers keep all their elements sorted by their key following the criterion
+		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
+		** @param val Value to be copied to (or moved as) the inserted element.
+		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
+		*/
+		pair<iterator,bool> insert (const value_type& val)
+		{
+			node	*tmp;
+
+			tmp = this->_tree.search(val.first);
+			this->_tree.insert(val);
+			if (tmp)
+				return (pair<iterator, bool>(tmp, false));
+			++this->_size;
+			return (pair<iterator, bool>(this->_tree.search(val.first), true));
+		}
+
+		/*
+		** Insert elements
+		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
+		** Because element keys in a map are unique, the insertion operation checks whether each inserted
+		** element has a key equivalent to the one of an element already in the container,
+		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
+		** For a similar container allowing for duplicate elements, see multimap.
+		** An alternative way to insert elements in a map is by using member function map::operator[].
+		** Internally, map containers keep all their elements sorted by their key following the criterion
+		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
+		** @param position Hint for the position where the element can be inserted.
+		** @param val Value to be copied to (or moved as) the inserted element.
+		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
+		*/
+		iterator insert (iterator position, const value_type& val)
+		{
+			(void) position;
+			return (this->insert(val).first);
+		}
+
+		/*
+		** Insert elements
+		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
+		** Because element keys in a map are unique, the insertion operation checks whether each inserted
+		** element has a key equivalent to the one of an element already in the container,
+		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
+		** For a similar container allowing for duplicate elements, see multimap.
+		** An alternative way to insert elements in a map is by using member function map::operator[].
+		** Internally, map containers keep all their elements sorted by their key following the criterion
+		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
+		** @param first Input iterators to the initial positions in a range.
+		** @param last Input iterators to the final positions in a range.
+		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
+		*/
+		template <class InputIterator>
+		void insert (InputIterator first, InputIterator last)
+		{
+			while (first != last)
+				this->insert(*(first++));
+		}
+
 		
 	/* ============================== MEMBER FUNCTIONS ============================== */
 	public:
@@ -262,27 +395,6 @@ class map
 		}
 	
 	/* ============================== HELPER MEMBER FUNCTIONS ============================== */
-	private:
-		/*
-		** insert a new element to the tree
-		** @param val the value to be inserted
-		** @param position a hint to which position the element should be inserted
-		** @return a pair which ::first point to the element, and ::Second indicate wheter the key is already in the tree or it is a new key
-		*/
-		pair<iterator,bool> _insert(const value_type& val, iterator *position = NULL)
-		{
-			node	*tmp;
-
-			tmp = this->_tree.search(val.first);
-			if (position)
-				this->_tree.insert(position->base(), position->base()->parent, val);
-			else
-				this->_tree.insert(val);
-			if (tmp)
-				return (pair<iterator, bool>(tmp, false));
-			++this->_size;
-			return (pair<iterator, bool>(this->_tree.search(val.first), true));
-		}
 };
 
 };
