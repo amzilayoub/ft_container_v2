@@ -383,8 +383,6 @@ namespace ft
 
 				if (!root)
 					root = this->create_node(value, parent);
-				else if (root->get_key() == value.first)
-					root->value->second = value.second;
 				else if (this->_compare(root->value->first, value.first))
 					root->right = this->insert(root->right, root, value);
 				else
