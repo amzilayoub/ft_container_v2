@@ -38,6 +38,8 @@ int main()
 		tree.insert(ft::make_pair(i, i * 10));
 
 	// tree1 = tree;
+	tree.erase(tree.begin(), tree.end());
+	// tree1.erase(tree1.begin(), tree1.end());
 	ft::map<int, int>::iterator it = tree1.begin();
 	for (; it != tree1.end();)
 	{

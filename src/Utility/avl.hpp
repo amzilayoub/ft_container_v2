@@ -365,8 +365,8 @@ namespace ft
 			node *insert(value_type const value)
 			{
 				this->root = this->insert(this->root, this->root_parent, value);
-
 				this->root_parent->left = this->root;
+
 				return (this->root);
 			}
 
@@ -401,6 +401,7 @@ namespace ft
 			node *delete_node(key_type key)
 			{
 				this->root = this->delete_node(this->root, key);
+				this->root_parent->left = this->root;
 
 				return (this->root);
 			}
@@ -418,8 +419,10 @@ namespace ft
 				
 				/*
 				** Targeted key has been found
+				** Two keys are considered equivalent if the container's comparison object returns false reflexively
+				** (i.e., no matter the order in which the elements are passed as arguments).
 				*/
-				if (root->get_key() == key)
+				if (this->_compare(root->get_key(), key) == this->_compare(key, root->get_key()))
 				{
 					node *tmp;
 
@@ -492,7 +495,12 @@ namespace ft
 			{
 				if (root == NULL)
 					return (root);
-				else if (root->get_key() == key)
+				/*
+				** Targeted key has been found
+				** Two keys are considered equivalent if the container's comparison object returns false reflexively
+				** (i.e., no matter the order in which the elements are passed as arguments).
+				*/
+				else if (this->_compare(root->get_key(), key) == this->_compare(key, root->get_key()))
 					return (root);
 				else if (this->_compare(root->get_key(), key))
 					return (this->search(root->right, key));

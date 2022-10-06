@@ -57,13 +57,6 @@ class map
 		typedef typename	ft::iterator_traits<iterator>::difference_type		difference_type;
 		typedef				size_t												size_type;
 	
-	/* ============================== MEMBER ATTRIBUTES ============================== */
-	private:
-		ft::AVL<Key, T, Compare, Alloc>	_tree;
-		key_compare						_comp;
-		allocator_type					_alloc;
-		size_type						_size;
-
 	/* ============================== MEMBER CLASS ============================== */
 	public:
 		class value_compare : public std::binary_function<value_type, value_type, bool>
@@ -84,6 +77,14 @@ class map
 				}
 		};
 
+	/* ============================== MEMBER ATTRIBUTES ============================== */
+	private:
+		ft::AVL<Key, T, Compare, Alloc>	_tree;
+		key_compare						_key_comp;
+		allocator_type					_alloc;
+		size_type						_size;
+
+
 	/* ============================== CONSTRUCTORS ============================== */
 	public:
 		/*
@@ -94,7 +95,7 @@ class map
 		explicit map (
 				const key_compare& comp = key_compare(),
 				const allocator_type& alloc = allocator_type()
-				) : _comp(comp), _alloc(alloc), _size(0)
+				) : _key_comp(comp), _alloc(alloc), _size(0)
 		{
 		}
 
@@ -110,7 +111,7 @@ class map
 			InputIterator first,
 			InputIterator last,
 			const key_compare& comp = key_compare(),
-			const allocator_type& alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0)
+			const allocator_type& alloc = allocator_type()) : _key_comp(comp), _alloc(alloc), _size(0)
 		{
 			this->insert(first, last);
 		}
@@ -381,13 +382,220 @@ class map
 				this->insert(*(first++));
 		}
 
+		/*
+		** Erase elements
+		** Removes from the map container either a single element or a range of elements ([first,last)).
+		** This effectively reduces the container size by the number of elements removed, which are destroyed.
+		** @param position Iterator pointing to a single element to be removed from the map.
+		** @return void
+		*/
+		void erase (iterator position)
+		{
+			if (this->_tree.search((*position).first))
+			{
+				this->_tree.delete_node((*position).first);
+				--this->_size;
+			}
+		}
+
+		/*
+		** Erase elements
+		** Removes from the map container either a single element or a range of elements ([first,last)).
+		** This effectively reduces the container size by the number of elements removed, which are destroyed.
+		** @param k Key of the element to be removed from the map.
+		** @return the function returns the number of elements erased.
+		*/
+		size_type erase (const key_type& k)
+		{
+			if (this->_tree.search(k))
+			{
+				this->_tree.delete_node(k);
+				--this->_size;
+				return (1);
+			}
+			return (0);
+		}
+
+		/*
+		** Erase elements
+		** Removes from the map container either a single element or a range of elements ([first,last)).
+		** This effectively reduces the container size by the number of elements removed, which are destroyed.
+		** @param first Iterators specifying a range within the map container to be removed
+		** @param last Iterators specifying a range within the map container to be removed
+		** @return void
+		*/
+    	void erase (iterator first, iterator last)
+		{
+			while (first != last)
+				this->erase(first++);
+		}
+
+		/*
+		** Swap content
+		** Exchanges the content of the container by the content of x, which is another map of the same type. Sizes may differ.
+		** After the call to this member function, the elements in this container are those which
+		** were in x before the call, and the elements of x are those which were in this.
+		** All iterators, references and pointers remain valid for the swapped objects.
+		** Notice that a non-member function exists with the same name, swap,
+		** overloading that algorithm with an optimization that behaves like this member function.
+		** @param x Another map container of the same type as this
+		*/
+		void swap (map& x)
+		{
+			map tmp;
+
+			tmp = (*this);
+			(*this) = x;
+			x = tmp;
+		}
+
+		/*
+		** Removes all elements from the map container (which are destroyed), leaving the container with a size of 0.
+		** @param void void
+		** @return void
+		*/
+		void clear()
+		{
+			this->erase(this->begin(), this->end());
+		}
+
+		/* =================== */
+		/* ==== OBSERVERS ==== */
+		/* =================== */
+		/*
+		** Return key comparison object
+		** Returns a copy of the comparison object used by the container to compare keys.
+		** The comparison object of a map object is set on construction. Its type
+		** (member key_compare) is the third template parameter of the map template. By default,
+		** this is a less object, which returns the same as operator<.
+		** This object determines the order of the elements in the container:
+		** it is a function pointer or a function object that takes two arguments of the same
+		** type as the element keys, and returns true if the first argument is considered to go before
+		** the second in the strict weak ordering it defines, and false otherwise.
+		** Two keys are considered equivalent if key_comp returns false reflexively
+		** (i.e., no matter the order in which the keys are passed as arguments).
+		** @param void void
+		** @return The comparison object.
+		*/
+		key_compare key_comp() const
+		{
+			return (this->_key_comp);
+		}
+
+		/*
+		** Return value comparison object
+		** Returns a comparison object that can be used to compare two
+		** elements to get whether the key of the first one goes before the second.
+		** The arguments taken by this function object are of member type value_type
+		** (defined in map as an alias of pair<const key_type,mapped_type>),
+		** but the mapped_type part of the value is not taken into consideration in this comparison.
+		** @param void void
+		** @return The comparison object for element values.
+		*/
+		value_compare value_comp() const
+		{
+			return (value_compare(this->_key_comp));
+		}
+
+		/* ==================== */
+		/* ==== OPERATIONS ==== */
+		/* ==================== */
+		/*
+		** Get iterator to element
+		** Searches the container for an element with a key equivalent to k and returns an iterator
+		** to it if found, otherwise it returns an iterator to map::end.
+		** Two keys are considered equivalent if the container's comparison
+		** object returns false reflexively (i.e., no matter the order in which the elements are passed as arguments).
+		** Another member function, map::count, can be used to just check whether a particular key exists.
+		** @param k Key to be searched for.
+		** @return An iterator to the element, if an element with specified key is found, or map::end otherwise.
+		*/
+		iterator find (const key_type& k)
+		{
+			node *target;
+
+			target = this->_tree.search(k);
+			return (target ? iterator(target) : this->end());
+		}
 		
+		/*
+		** Get iterator to element
+		** Searches the container for an element with a key equivalent to k and returns an iterator
+		** to it if found, otherwise it returns an iterator to map::end.
+		** Two keys are considered equivalent if the container's comparison
+		** object returns false reflexively (i.e., no matter the order in which the elements are passed as arguments).
+		** Another member function, map::count, can be used to just check whether a particular key exists.
+		** @param k Key to be searched for.
+		** @return An iterator to the element, if an element with specified key is found, or map::end otherwise.
+		*/
+		const_iterator find (const key_type& k) const
+		{
+			node *target;
+
+			target = this->_tree.search(k);
+			return (target ? const_iterator(target) : this->end());
+		}
+
+		/*
+		** Count elements with a specific key
+		** Searches the container for elements with a key equivalent to k and returns the number of matches.
+		** Because all elements in a map container are unique,
+		** the function can only return 1 (if the element is found) or zero (otherwise).
+		** Two keys are considered equivalent if the container's comparison
+		** object returns false reflexively (i.e., no matter the order in which the keys are passed as arguments).
+		** @param k Key to search for.
+		** @return 1 if the container contains an element whose key is equivalent to k, or zero otherwise.
+		*/
+		size_type count (const key_type& k) const
+		{
+			return (this->_tree.search(k) != NULL);
+		}
+
+		/*
+		** Return iterator to lower bound
+		** Returns an iterator pointing to the first element in the container whose
+		** key is not considered to go before k (i.e., either it is equivalent or goes after).
+		** The function uses its internal comparison object (key_comp) to determine this,
+		** returning an iterator to the first element for which key_comp(element_key,k) would return false.
+		** If the map class is instantiated with the default comparison type (less),
+		** the function returns an iterator to the first element whose key is not less than k.
+		** A similar member function, upper_bound, has the same behavior as lower_bound,
+		** except in the case that the map contains an element with a key equivalent to k:
+		** In this case, lower_bound returns an iterator pointing to that element,
+		** whereas upper_bound returns an iterator pointing to the next element.
+		** @param k Key to search for.
+		** @return An iterator to the the first element in the container whose key is not considered to go before k
+		*/
+		iterator lower_bound (const key_type& k)
+		{
+			iterator	it;
+			iterator	prev;
+
+			it = this->begin();
+			prev = it;
+			for (; it < this->end(); it++)
+			{
+				if (this->_key_comp(!it->first, k))
+				{
+					
+				}
+
+
+			}
+
+		}
+		const_iterator lower_bound (const key_type& k) const;
+
+		/* =================== */
+		/* ==== ALLOCATOR ==== */
+		/* =================== */
+
 	/* ============================== MEMBER FUNCTIONS ============================== */
 	public:
 		map& operator= (const map& x)
 		{
 			this->_alloc = x._alloc;
-			this->_comp = x._comp;
+			this->_key_comp = x._key_comp;
 			this->_tree = x._tree;
 			this->_size = x._size;
 
