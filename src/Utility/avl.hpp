@@ -491,18 +491,17 @@ namespace ft
 						{
 							root->right = tmp->right;
 							root->left = tmp->left;
-							root->value = tmp->value;
-							// Here we should free the value attribite
+							this->_alloc.destroy(root->value);
+							this->_alloc.construct(root->value, *(tmp->value));
 						}
-						this->_alloc_node.deallocate(tmp, 1);
+						this->deallocate_node(tmp);
 					}
 					else
 					{
 						tmp = root->right->minimum_node();
 
-						root->value = tmp->value;
-						// this->_alloc.destroy(root->value);
-						// this->_alloc.construct(root->value, *(tmp->value));
+						this->_alloc.destroy(root->value);
+						this->_alloc.construct(root->value, *(tmp->value));
 						root->right = this->delete_node(root->right, tmp->get_key());
 					}
 				}

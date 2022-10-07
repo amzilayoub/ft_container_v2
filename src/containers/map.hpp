@@ -603,7 +603,18 @@ class map
 		}
 
 		/*
-		**
+		** Return iterator to upper bound
+		** Returns an iterator pointing to the first element in the container whose key is considered to go after k.
+		** The function uses its internal comparison object (key_comp) to determine this,
+		** returning an iterator to the first element for which key_comp(k,element_key) would return true.
+		** If the map class is instantiated with the default comparison type (less),
+		** the function returns an iterator to the first element whose key is greater than k.
+		** A similar member function, lower_bound, has the same behavior as upper_bound,
+		** except in the case that the map contains an element with a key equivalent
+		** to k: In this case lower_bound returns an iterator pointing to that element,
+		** whereas upper_bound returns an iterator pointing to the next element.
+		** @paragm k Key to search for.
+		** @return An iterator to the the first element in the container whose key is considered to go after k, or map::end if no keys are considered to go after k.
 		*/
 		iterator upper_bound (const key_type& k)
 		{
@@ -612,6 +623,21 @@ class map
 			tmp = this->_tree.upper_bound(k);
 			return (tmp ? iterator(tmp) : this->end());
 		}
+		
+		/*
+		** Return iterator to upper bound
+		** Returns an iterator pointing to the first element in the container whose key is considered to go after k.
+		** The function uses its internal comparison object (key_comp) to determine this,
+		** returning an iterator to the first element for which key_comp(k,element_key) would return true.
+		** If the map class is instantiated with the default comparison type (less),
+		** the function returns an iterator to the first element whose key is greater than k.
+		** A similar member function, lower_bound, has the same behavior as upper_bound,
+		** except in the case that the map contains an element with a key equivalent
+		** to k: In this case lower_bound returns an iterator pointing to that element,
+		** whereas upper_bound returns an iterator pointing to the next element.
+		** @paragm k Key to search for.
+		** @return An iterator to the the first element in the container whose key is considered to go after k, or map::end if no keys are considered to go after k.
+		*/
 		const_iterator upper_bound (const key_type& k) const
 		{
 			node *tmp;
@@ -620,9 +646,53 @@ class map
 			return (tmp ? const_iterator(tmp) : this->end());
 		}
 
+		/*
+		** Get range of equal elements
+		** Returns the bounds of a range that includes all the elements in the container which have a key equivalent to k.
+		** Because the elements in a map container have unique keys,
+		** the range returned will contain a single element at most.
+		** If no matches are found, the range returned has a length of zero,
+		** with both iterators pointing to the first element that has a key
+		** considered to go after k according to the container's internal comparison object (key_comp).
+		** Two keys are considered equivalent if the container's comparison object
+		** returns false reflexively (i.e., no matter the order in which the keys are passed as arguments).
+		** @param k Key to search for.
+		** @return The function returns a pair, whose member pair::first is the lower bound of the range (the same as lower_bound), and pair::second is the upper bound (the same as upper_bound).
+		*/
+		pair<const_iterator,const_iterator> equal_range (const key_type& k) const
+		{
+			return (ft::make_pair(this->lower_bound(k), this->upper_bound(k)));
+		}
+		
+		/*
+		** Get range of equal elements
+		** Returns the bounds of a range that includes all the elements in the container which have a key equivalent to k.
+		** Because the elements in a map container have unique keys,
+		** the range returned will contain a single element at most.
+		** If no matches are found, the range returned has a length of zero,
+		** with both iterators pointing to the first element that has a key
+		** considered to go after k according to the container's internal comparison object (key_comp).
+		** Two keys are considered equivalent if the container's comparison object
+		** returns false reflexively (i.e., no matter the order in which the keys are passed as arguments).
+		** @param k Key to search for.
+		** @return The function returns a pair, whose member pair::first is the lower bound of the range (the same as lower_bound), and pair::second is the upper bound (the same as upper_bound).
+		*/
+		pair<iterator,iterator> equal_range (const key_type& k)
+		{
+			return (ft::make_pair(this->lower_bound(k), this->upper_bound(k)));
+		}
 		/* =================== */
 		/* ==== ALLOCATOR ==== */
 		/* =================== */
+		/*
+		** Returns a copy of the allocator object associated with the map.
+		** @param void void
+		** @return The allocator.
+		*/
+		allocator_type get_allocator() const
+		{
+			return (this->_alloc);
+		}
 
 	/* ============================== MEMBER FUNCTIONS ============================== */
 	public:

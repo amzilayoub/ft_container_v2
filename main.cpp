@@ -16,28 +16,22 @@
 #include <iostream>
 #include <map>
 
+using namespace std;
 int main ()
 {
+  int psize;
   ft::map<char,int> mymap;
-  ft::map<char,int>::iterator itlow,itup;
+  ft::pair<const char,int>* p;
 
-  mymap['a']=20;
-  mymap['b']=40;
-  mymap['c']=60;
-  mymap['d']=80;
-  mymap['e']=100;
+  // allocate an array of 5 elements using mymap's allocator:
+  p=mymap.get_allocator().allocate(5);
 
-  itlow=mymap.lower_bound ('b');  // itlow points to b
-  itup=mymap.upper_bound ('d');   // itup points to e (not d!)
+  // assign some values to array
+  psize = sizeof(ft::map<char,int>::value_type)*5;
 
-	// std::cout << itlow->first << std::endl;
-	// std::cout << itup->first << std::endl;
-	(void)mymap._tree;
-	mymap.erase(itlow,itup);        // erases [itlow,itup)
+  std::cout << "The allocated array has a size of " << psize << " bytes.\n";
 
-//   // print content:
-  for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
-    std::cout << it->first << " => " << it->second << '\n';
+  mymap.get_allocator().deallocate(p,5);
 
   return 0;
 }
