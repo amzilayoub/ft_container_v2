@@ -45,6 +45,7 @@ namespace ft
 				node													*parent;
 				node													*left;
 				node													*right;
+				Compare													_compare;
 
 				value_type												*value;
 				size_type												height;
@@ -82,6 +83,40 @@ namespace ft
 				mapped_type &get_value()
 				{
 					return (this->value->second);
+				}
+
+				/*
+				** compare 2 keys and return if they are equal
+				** @param k the first key
+				** @return true if they are the same key, otherwise false.
+				*/
+				bool is_equal(key_type k)
+				{
+					/*
+					** Two keys are considered equivalent if the container's comparison object returns false reflexively
+					** (i.e., no matter the order in which the elements are passed as arguments).
+					*/
+					return (this->_compare(this->get_key(), k) == this->_compare(k, this->get_key()));
+				}
+
+				/*
+				** compare 2 keys and return if they met the condition bellow
+				** @param k element key
+				** @return true if they met the condition, otherwise false.
+				*/
+				bool is_lower_bound(key_type k)
+				{
+					return ((this->_compare(this->get_key(), k)) == false);
+				}
+
+				/*
+				** compare 2 keys and return if they met the condition bellow
+				** @param k element key
+				** @return true if they met the condition, otherwise false.
+				*/
+				bool is_upper_bound(key_type k)
+				{
+					return (this->_compare(k, this->get_key()) == true);
 				}
 
 				/*
@@ -422,7 +457,7 @@ namespace ft
 				** Two keys are considered equivalent if the container's comparison object returns false reflexively
 				** (i.e., no matter the order in which the elements are passed as arguments).
 				*/
-				if (this->_compare(root->get_key(), key) == this->_compare(key, root->get_key()))
+				if (root->is_equal(key))
 				{
 					node *tmp;
 
@@ -437,6 +472,11 @@ namespace ft
 							tmp->parent->right = NULL;
 						else
 							tmp->parent->left = NULL;
+						if (root->right)
+							root->right->parent = tmp;
+						if (root->left)
+							root->left->parent = tmp;
+
 						tmp->parent = root->parent;
 						tmp->left = root->left;
 						tmp->right = root->right;
@@ -495,17 +535,88 @@ namespace ft
 			{
 				if (root == NULL)
 					return (root);
-				/*
-				** Targeted key has been found
-				** Two keys are considered equivalent if the container's comparison object returns false reflexively
-				** (i.e., no matter the order in which the elements are passed as arguments).
-				*/
-				else if (this->_compare(root->get_key(), key) == this->_compare(key, root->get_key()))
+				else if (root->is_equal(key))
 					return (root);
 				else if (this->_compare(root->get_key(), key))
 					return (this->search(root->right, key));
 				else
 					return (this->search(root->left, key));
+			}
+
+			/*
+			** search for a the lower bound inside the tree
+			** @param root subtree to search at
+			** @param key the needle
+			** @return return the lower bound, otherwise NULL
+			*/
+			node *lower_bound(node *root, key_type const &key)
+			{
+				node *tmp;
+
+				tmp = NULL;
+				if (!root || root->is_equal(key))
+					return (root);
+				if (this->_compare(key, root->get_key()))
+					tmp = this->lower_bound(root->left, key);
+				else
+					tmp = this->lower_bound(root->right, key);
+				/*
+				** return the tmp value, in case its key is equal to the key variable,
+				** or its key is less than the root key
+				*/
+				if (tmp && (tmp->is_equal(key) || this->_compare(tmp->get_key(), root->get_key())))
+					return (tmp);
+				else if (root->is_lower_bound(key))
+					return (root);
+				return (tmp);
+			}
+
+			/*
+			** search for a the lower bound inside the tree
+			** @param key the needle
+			** @return return the lower bound, otherwise NULL
+			*/
+			node *lower_bound(key_type const &key)
+			{
+				return (this->lower_bound(this->root, key));
+			}
+
+			/*
+			** search for a the upper bound inside the tree
+			** @param root subtree to search at
+			** @param key the needle
+			** @return return the upper bound, otherwise NULL
+			*/
+			node *upper_bound(node *root, key_type const &key)
+			{
+				node *tmp;
+
+				tmp = NULL;
+				if (!root)
+					return (root);
+				if (this->_compare(key, root->get_key()))
+					tmp = this->upper_bound(root->left, key);
+				else
+					tmp = this->upper_bound(root->right, key);
+				/*
+				** return the tmp value, in case its key is equal to the key variable,
+				** or its key is less than the root key
+				*/
+				if (tmp && this->_compare(tmp->get_key(), root->get_key()))
+					return (tmp);
+				else if (root->is_upper_bound(key))
+					return (root);
+				return (tmp);
+			}
+
+			/*
+			** search for a the upper bound inside the tree
+			** @param key the needle
+			** @return return the upper bound, otherwise NULL
+			*/
+			node *upper_bound(key_type const &key)
+			{
+				return (this->upper_bound(this->root, key));
 			}
 
 			/*

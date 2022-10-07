@@ -78,7 +78,7 @@ class map
 		};
 
 	/* ============================== MEMBER ATTRIBUTES ============================== */
-	private:
+	public:
 		ft::AVL<Key, T, Compare, Alloc>	_tree;
 		key_compare						_key_comp;
 		allocator_type					_alloc;
@@ -426,8 +426,13 @@ class map
 		*/
     	void erase (iterator first, iterator last)
 		{
+			ft::Vector<key_type> tmp;
+			typename ft::Vector<key_type>::iterator it;
+
 			while (first != last)
-				this->erase(first++);
+				tmp.push_back((first++)->first);
+			for (it = tmp.begin(); it != tmp.end(); it++)
+				this->erase(*it);
 		}
 
 		/*
@@ -568,23 +573,52 @@ class map
 		*/
 		iterator lower_bound (const key_type& k)
 		{
-			iterator	it;
-			iterator	prev;
+			node *tmp;
 
-			it = this->begin();
-			prev = it;
-			for (; it < this->end(); it++)
-			{
-				if (this->_key_comp(!it->first, k))
-				{
-					
-				}
-
-
-			}
-
+			tmp = this->_tree.lower_bound(k);
+			return (tmp ? iterator(tmp) : this->end());
 		}
-		const_iterator lower_bound (const key_type& k) const;
+
+		/*
+		** Return iterator to lower bound
+		** Returns an iterator pointing to the first element in the container whose
+		** key is not considered to go before k (i.e., either it is equivalent or goes after).
+		** The function uses its internal comparison object (key_comp) to determine this,
+		** returning an iterator to the first element for which key_comp(element_key,k) would return false.
+		** If the map class is instantiated with the default comparison type (less),
+		** the function returns an iterator to the first element whose key is not less than k.
+		** A similar member function, upper_bound, has the same behavior as lower_bound,
+		** except in the case that the map contains an element with a key equivalent to k:
+		** In this case, lower_bound returns an iterator pointing to that element,
+		** whereas upper_bound returns an iterator pointing to the next element.
+		** @param k Key to search for.
+		** @return An iterator to the the first element in the container whose key is not considered to go before k
+		*/
+		const_iterator lower_bound (const key_type& k) const
+		{
+			node *tmp;
+
+			tmp = this->_tree.lower_bound(k);
+			return (tmp ? const_iterator(tmp) : this->end());
+		}
+
+		/*
+		**
+		*/
+		iterator upper_bound (const key_type& k)
+		{
+			node *tmp;
+
+			tmp = this->_tree.upper_bound(k);
+			return (tmp ? iterator(tmp) : this->end());
+		}
+		const_iterator upper_bound (const key_type& k) const
+		{
+			node *tmp;
+
+			tmp = this->_tree.upper_bound(k);
+			return (tmp ? const_iterator(tmp) : this->end());
+		}
 
 		/* =================== */
 		/* ==== ALLOCATOR ==== */

@@ -13,47 +13,31 @@
 #include <sys/time.h>
 # include <map>
 # include "src/containers/map.hpp"
+#include <iostream>
+#include <map>
 
-time_t get_time(void)
+int main ()
 {
-    struct timeval time_now;
+  ft::map<char,int> mymap;
+  ft::map<char,int>::iterator itlow,itup;
 
-    gettimeofday(&time_now, NULL);
-    time_t msecs_time = (time_now.tv_sec * 1e3) + (time_now.tv_usec / 1e3);
-    return (msecs_time);
-}
+  mymap['a']=20;
+  mymap['b']=40;
+  mymap['c']=60;
+  mymap['d']=80;
+  mymap['e']=100;
 
-int main()
-{
-	ft::map<int, int> tree;
+  itlow=mymap.lower_bound ('b');  // itlow points to b
+  itup=mymap.upper_bound ('d');   // itup points to e (not d!)
 
-	tree[80];
-	for (int i = 1; i <= 10; i++)
-		tree.insert(ft::make_pair(i, i * 10));
+	std::cout << itlow->first << std::endl;
+	std::cout << itup->first << std::endl;
+	(void)mymap._tree;
+	mymap.erase(itlow,itup);        // erases [itlow,itup)
 
+//   // print content:
+  for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
 
-	ft::map<int, int> tree1(tree.begin(), tree.end());
-
-	for (int i = -10; i < 0; i++)
-		tree.insert(ft::make_pair(i, i * 10));
-
-	// tree1 = tree;
-	tree.erase(tree.begin(), tree.end());
-	// tree1.erase(tree1.begin(), tree1.end());
-	ft::map<int, int>::iterator it = tree1.begin();
-	for (; it != tree1.end();)
-	{
-		std::cout << it->first << " | " << it->second << std::endl;
-		++it;
-	}
-
-	std::cout << "==========" << std::endl;
-
-
-	it = tree.end();
-	for (; it != tree.begin();)
-	{
-		--it;
-		std::cout << it->first << " | " << it->second << std::endl;
-	}
+  return 0;
 }
