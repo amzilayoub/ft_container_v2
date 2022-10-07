@@ -16,22 +16,17 @@
 #include <iostream>
 #include <map>
 
+
 using namespace std;
 int main ()
 {
-  int psize;
-  ft::map<char,int> mymap;
-  ft::pair<const char,int>* p;
+  ft::Map<int, char> my_m;
+	for (int i = 0; i < 1e2; i++)
+		my_m.insert(ft::make_pair(i, 'A'));
 
-  // allocate an array of 5 elements using mymap's allocator:
-  p=mymap.get_allocator().allocate(5);
-
-  // assign some values to array
-  psize = sizeof(ft::map<char,int>::value_type)*5;
-
-  std::cout << "The allocated array has a size of " << psize << " bytes.\n";
-
-  mymap.get_allocator().deallocate(p,5);
-
-  return 0;
+	ft::Map<int, char>::reverse_iterator my_rit2(my_m.end());
+	ft::Map<int, char>::const_reverse_iterator c_it, c_ob(my_m.end());
+	c_it = my_rit2;
+	std::cout << (*(*my_rit2)).first << std::endl;
+	// EQUAL(my_rit2->first == c_it->first && my_rit2->first == c_ob->first);
 }

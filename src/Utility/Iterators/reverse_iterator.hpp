@@ -43,7 +43,7 @@ class reverse_iterator
 		** Constructs a reverse iterator that points to no object.
 		** The internal base iterator is value-initialized.
 		*/
-					reverse_iterator() : _iter() {}
+		reverse_iterator() : _iter() {}
 		
 		/*
 		** initalization constructor

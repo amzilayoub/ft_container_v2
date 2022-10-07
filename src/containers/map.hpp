@@ -1,19 +1,19 @@
 /*
 ** Map
-** Maps are associative containers that store elements formed by a combination of a key value and a mapped value, following a specific order.
+** Maps are associative containers that store elements formed by a combination of a key value and a Mapped value, following a specific order.
 ** 
-** In a map, the key values are generally used to sort and uniquely identify the elements,
-** while the mapped values store the content associated to this key.
-** The types of key and mapped value may differ, and are grouped together in member type value_type,
+** In a Map, the key values are generally used to sort and uniquely identify the elements,
+** while the Mapped values store the content associated to this key.
+** The types of key and Mapped value may differ, and are grouped together in member type value_type,
 ** which is a pair type combining both:
 **  
 ** typedef pair<const Key, T> value_type;
 ** 
-** Internally, the elements in a map are always sorted by its key following a specific strict weak
+** Internally, the elements in a Map are always sorted by its key following a specific strict weak
 ** ordering criterion indicated by its internal comparison object (of type Compare).
-** map containers are generally slower than unordered_map containers to access individual
+** Map containers are generally slower than unordered_Map containers to access individual
 ** elements by their key, but they allow the direct iteration on subsets based on their order.
-** The mapped values in a map can be accessed directly by their corresponding key using the bracket operator ((operator[]).
+** The Mapped values in a Map can be accessed directly by their corresponding key using the bracket operator ((operator[]).
 ** Maps are typically implemented as binary search trees.
 */
 
@@ -28,22 +28,21 @@
 namespace ft
 {
 
-template < class Key,											// map::key_type
-           class T,												// map::mapped_type
-           class Compare = std::less<Key>,						// map::key_compare
-           class Alloc = std::allocator<pair<const Key,T> >		// map::allocator_type
+template < class Key,											// Map::key_type
+           class T,												// Map::Mapped_type
+           class Compare = std::less<Key>,						// Map::key_compare
+           class Alloc = std::allocator<pair<const Key,T> >		// Map::allocator_type
            >
-class map
+class Map
 {
 	/* ============================== MEMBER TYPE ============================== */
 	private:
 		typedef typename	ft::AVL<Key, T, Compare, Alloc>::node				node;
-		typedef typename	ft::AVL<Key, const T, Compare, Alloc>::node			const_node;
 
 	public:
 		typedef				Key													key_type;
-		typedef				T													mapped_type;
-		typedef				ft::pair<const key_type, mapped_type>				value_type;
+		typedef				T													Mapped_type;
+		typedef				ft::pair<const key_type, Mapped_type>				value_type;
 		typedef				Compare												key_compare;
 		typedef				Alloc												allocator_type;
 		typedef typename	allocator_type::reference							reference;
@@ -51,7 +50,7 @@ class map
 		typedef typename	allocator_type::pointer								pointer;
 		typedef typename	allocator_type::const_pointer						const_pointer;
 		typedef typename	ft::bidirectional_iterator<node>					iterator;
-		typedef typename	ft::bidirectional_iterator<const_node>				const_iterator;
+		typedef typename	ft::bidirectional_iterator<const node>				const_iterator;
 		typedef typename	ft::reverse_iterator<iterator>						reverse_iterator;
 		typedef typename	ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 		typedef typename	ft::iterator_traits<iterator>::difference_type		difference_type;
@@ -61,7 +60,7 @@ class map
 	public:
 		class value_compare : public std::binary_function<value_type, value_type, bool>
 		{
-			friend class map;
+			friend class Map;
 			/* ========= MEMBER CLASS ========= */
 			protected:
 				Compare comp;
@@ -88,11 +87,11 @@ class map
 	/* ============================== CONSTRUCTORS ============================== */
 	public:
 		/*
-		** Constructs a map container object, initializing its contents depending on the constructor version used
+		** Constructs a Map container object, initializing its contents depending on the constructor version used
 		** @param comp Binary predicate that, taking two element keys as argument, returns true if the first argument goes before the second argument in the strict weak ordering it defines, and false otherwise.
 		** @param alloc Allocator object.
 		*/
-		explicit map (
+		explicit Map (
 				const key_compare& comp = key_compare(),
 				const allocator_type& alloc = allocator_type()
 				) : _key_comp(comp), _alloc(alloc), _size(0)
@@ -100,14 +99,14 @@ class map
 		}
 
 		/*
-		** Constructs a map container object, initializing its contents depending on the constructor version used
+		** Constructs a Map container object, initializing its contents depending on the constructor version used
 		** @param first Input iterators to the initial positions in a range.
 		** @param last Input iterators to the final positions in a range.
 		** @param comp Binary predicate that, taking two element keys as argument, returns true if the first argument goes before the second argument in the strict weak ordering it defines, and false otherwise.
 		** @param alloc Allocator object.
 		*/
 		template <class InputIterator>
-		map (
+		Map (
 			InputIterator first,
 			InputIterator last,
 			const key_compare& comp = key_compare(),
@@ -117,10 +116,10 @@ class map
 		}
 
 		/*
-		** Constructs a map container object, initializing its contents depending on the constructor version used
-		** @param x Another map object of the same type
+		** Constructs a Map container object, initializing its contents depending on the constructor version used
+		** @param x Another Map object of the same type
 		*/
-		map (const map& x)
+		Map (const Map& x)
 		{
 			(*this) = x;
 		}
@@ -132,8 +131,8 @@ class map
 		/* =================== */
 		/*
 		** Return iterator to beginning
-		** Returns an iterator referring to the first element in the map container.
-		** Because map containers keep their elements ordered at all times, begin points to the element that goes first following the container's sorting criterion.
+		** Returns an iterator referring to the first element in the Map container.
+		** Because Map containers keep their elements ordered at all times, begin points to the element that goes first following the container's sorting criterion.
 		** If the container is empty, the returned iterator value shall not be dereferenced.
 		** @param void void
 		** @return An iterator to the first element in the container.
@@ -145,8 +144,8 @@ class map
 
 		/*
 		** Return iterator to beginning
-		** Returns an iterator referring to the first element in the map container.
-		** Because map containers keep their elements ordered at all times, begin points to the element that goes first following the container's sorting criterion.
+		** Returns an iterator referring to the first element in the Map container.
+		** Because Map containers keep their elements ordered at all times, begin points to the element that goes first following the container's sorting criterion.
 		** If the container is empty, the returned iterator value shall not be dereferenced.
 		** @param void void
 		** @return An iterator to the first element in the container.
@@ -158,13 +157,13 @@ class map
 
 		/*
 		** Return iterator to end
-		** Returns an iterator referring to the past-the-end element in the map container.
+		** Returns an iterator referring to the past-the-end element in the Map container.
 		** The past-the-end element is the theoretical element that would follow the last
-		** element in the map container. It does not point to any element, and thus shall not be dereferenced.
+		** element in the Map container. It does not point to any element, and thus shall not be dereferenced.
 		** Because the ranges used by functions of the standard library
 		** do not include the element pointed by their closing iterator,
-		** this function is often used in combination with map::begin to specify a range including all the elements in the container.
-		** If the container is empty, this function returns the same as map::begin.
+		** this function is often used in combination with Map::begin to specify a range including all the elements in the container.
+		** If the container is empty, this function returns the same as Map::begin.
 		** @param void void
 		** @param An iterator to the past-the-end element in the container. 
 		*/
@@ -180,13 +179,13 @@ class map
 		
 		/*
 		** Return iterator to end
-		** Returns an iterator referring to the past-the-end element in the map container.
+		** Returns an iterator referring to the past-the-end element in the Map container.
 		** The past-the-end element is the theoretical element that would follow the last
-		** element in the map container. It does not point to any element, and thus shall not be dereferenced.
+		** element in the Map container. It does not point to any element, and thus shall not be dereferenced.
 		** Because the ranges used by functions of the standard library
 		** do not include the element pointed by their closing iterator,
-		** this function is often used in combination with map::begin to specify a range including all the elements in the container.
-		** If the container is empty, this function returns the same as map::begin.
+		** this function is often used in combination with Map::begin to specify a range including all the elements in the container.
+		** If the container is empty, this function returns the same as Map::begin.
 		** @param void void
 		** @param An iterator to the past-the-end element in the container. 
 		*/
@@ -229,8 +228,8 @@ class map
 		/*
 		** Return reverse iterator to reverse end
 		** Returns a reverse iterator pointing to the theoretical element right before
-		** the first element in the map container (which is considered its reverse end).
-		** The range between map::rbegin and map::rend contains all the elements of the container (in reverse order).
+		** the first element in the Map container (which is considered its reverse end).
+		** The range between Map::rbegin and Map::rend contains all the elements of the container (in reverse order).
 		** @param void void
 		** @return A reverse iterator to the reverse end of the sequence container.
 		*/
@@ -242,8 +241,8 @@ class map
 		/*
 		** Return reverse iterator to reverse end
 		** Returns a reverse iterator pointing to the theoretical element right before
-		** the first element in the map container (which is considered its reverse end).
-		** The range between map::rbegin and map::rend contains all the elements of the container (in reverse order).
+		** the first element in the Map container (which is considered its reverse end).
+		** The range between Map::rbegin and Map::rend contains all the elements of the container (in reverse order).
 		** @param void void
 		** @return A reverse iterator to the reverse end of the sequence container.
 		*/
@@ -257,8 +256,8 @@ class map
 		/* ================== */
 		/*
 		** Test whether container is empty
-		** Returns whether the map container is empty (i.e. whether its size is 0).
-		** This function does not modify the container in any way. To clear the content of a map container, see map::clear.
+		** Returns whether the Map container is empty (i.e. whether its size is 0).
+		** This function does not modify the container in any way. To clear the content of a Map container, see Map::clear.
 		** @param void void
 		** @return true if the container size is 0, false otherwise.
 		*/
@@ -269,7 +268,7 @@ class map
 
 		/*
 		** Return container size
-		** Returns the number of elements in the map container.
+		** Returns the number of elements in the Map container.
 		** @param void void
 		** @return The number of elements in the container.
 		*/
@@ -280,13 +279,13 @@ class map
 
 		/*
 		** Return maximum size
-		** Returns the maximum number of elements that the map container can hold.
+		** Returns the maximum number of elements that the Map container can hold.
 		** This is the maximum potential size the container can reach
 		** due to known system or library implementation limitations,
 		** but the container is by no means guaranteed to be able to reach that size:
 		** it can still fail to allocate storage at any point before that size is reached.
 		** @param void void
-		** @return The maximum number of elements a map container can hold as content.
+		** @return The maximum number of elements a Map container can hold as content.
 		*/
 		size_type max_size() const
 		{
@@ -298,19 +297,19 @@ class map
 		/* ======================== */
 		/*
 		** Access element
-		** If k matches the key of an element in the container, the function returns a reference to its mapped value.
+		** If k matches the key of an element in the container, the function returns a reference to its Mapped value.
 		** If k does not match the key of any element in the container,
-		** the function inserts a new element with that key and returns a reference to its mapped value.
-		** Notice that this always increases the container size by one, even if no mapped
+		** the function inserts a new element with that key and returns a reference to its Mapped value.
+		** Notice that this always increases the container size by one, even if no Mapped
 		** value is assigned to the element (the element is constructed using its default constructor).
-		** A similar member function, map::at, has the same behavior when an element with the key exists,
+		** A similar member function, Map::at, has the same behavior when an element with the key exists,
 		** but throws an exception when it does not.
-		** @param k Key value of the element whose mapped value is accessed.
-		** @return A reference to the mapped value of the element with a key value equivalent to k.
+		** @param k Key value of the element whose Mapped value is accessed.
+		** @return A reference to the Mapped value of the element with a key value equivalent to k.
 		*/
-		mapped_type& operator[] (const key_type& k)
+		Mapped_type& operator[] (const key_type& k)
 		{
-			return ((*((this->insert(make_pair(k, mapped_type()))).first)).second);
+			return ((*((this->insert(make_pair(k, Mapped_type()))).first)).second);
 		}
 
 		/* =================== */
@@ -319,15 +318,15 @@ class map
 		/*
 		** Insert elements
 		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
-		** Because element keys in a map are unique, the insertion operation checks whether each inserted
+		** Because element keys in a Map are unique, the insertion operation checks whether each inserted
 		** element has a key equivalent to the one of an element already in the container,
 		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
-		** For a similar container allowing for duplicate elements, see multimap.
-		** An alternative way to insert elements in a map is by using member function map::operator[].
-		** Internally, map containers keep all their elements sorted by their key following the criterion
+		** For a similar container allowing for duplicate elements, see multiMap.
+		** An alternative way to insert elements in a Map is by using member function Map::operator[].
+		** Internally, Map containers keep all their elements sorted by their key following the criterion
 		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
 		** @param val Value to be copied to (or moved as) the inserted element.
-		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
+		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the Map
 		*/
 		pair<iterator,bool> insert (const value_type& val)
 		{
@@ -344,16 +343,16 @@ class map
 		/*
 		** Insert elements
 		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
-		** Because element keys in a map are unique, the insertion operation checks whether each inserted
+		** Because element keys in a Map are unique, the insertion operation checks whether each inserted
 		** element has a key equivalent to the one of an element already in the container,
 		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
-		** For a similar container allowing for duplicate elements, see multimap.
-		** An alternative way to insert elements in a map is by using member function map::operator[].
-		** Internally, map containers keep all their elements sorted by their key following the criterion
+		** For a similar container allowing for duplicate elements, see multiMap.
+		** An alternative way to insert elements in a Map is by using member function Map::operator[].
+		** Internally, Map containers keep all their elements sorted by their key following the criterion
 		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
 		** @param position Hint for the position where the element can be inserted.
 		** @param val Value to be copied to (or moved as) the inserted element.
-		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
+		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the Map
 		*/
 		iterator insert (iterator position, const value_type& val)
 		{
@@ -364,16 +363,16 @@ class map
 		/*
 		** Insert elements
 		** Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
-		** Because element keys in a map are unique, the insertion operation checks whether each inserted
+		** Because element keys in a Map are unique, the insertion operation checks whether each inserted
 		** element has a key equivalent to the one of an element already in the container,
 		** and if so, the element is not inserted, returning an iterator to this existing element (if the function returns a value).
-		** For a similar container allowing for duplicate elements, see multimap.
-		** An alternative way to insert elements in a map is by using member function map::operator[].
-		** Internally, map containers keep all their elements sorted by their key following the criterion
+		** For a similar container allowing for duplicate elements, see multiMap.
+		** An alternative way to insert elements in a Map is by using member function Map::operator[].
+		** Internally, Map containers keep all their elements sorted by their key following the criterion
 		** specified by its comparison object. The elements are always inserted in its respective position following this ordering.
 		** @param first Input iterators to the initial positions in a range.
 		** @param last Input iterators to the final positions in a range.
-		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the map
+		** @return return a pair, with its member pair::first set to an iterator pointing to either the newly inserted element or to the element with an equivalent key in the Map
 		*/
 		template <class InputIterator>
 		void insert (InputIterator first, InputIterator last)
@@ -384,9 +383,9 @@ class map
 
 		/*
 		** Erase elements
-		** Removes from the map container either a single element or a range of elements ([first,last)).
+		** Removes from the Map container either a single element or a range of elements ([first,last)).
 		** This effectively reduces the container size by the number of elements removed, which are destroyed.
-		** @param position Iterator pointing to a single element to be removed from the map.
+		** @param position Iterator pointing to a single element to be removed from the Map.
 		** @return void
 		*/
 		void erase (iterator position)
@@ -400,9 +399,9 @@ class map
 
 		/*
 		** Erase elements
-		** Removes from the map container either a single element or a range of elements ([first,last)).
+		** Removes from the Map container either a single element or a range of elements ([first,last)).
 		** This effectively reduces the container size by the number of elements removed, which are destroyed.
-		** @param k Key of the element to be removed from the map.
+		** @param k Key of the element to be removed from the Map.
 		** @return the function returns the number of elements erased.
 		*/
 		size_type erase (const key_type& k)
@@ -418,10 +417,10 @@ class map
 
 		/*
 		** Erase elements
-		** Removes from the map container either a single element or a range of elements ([first,last)).
+		** Removes from the Map container either a single element or a range of elements ([first,last)).
 		** This effectively reduces the container size by the number of elements removed, which are destroyed.
-		** @param first Iterators specifying a range within the map container to be removed
-		** @param last Iterators specifying a range within the map container to be removed
+		** @param first Iterators specifying a range within the Map container to be removed
+		** @param last Iterators specifying a range within the Map container to be removed
 		** @return void
 		*/
     	void erase (iterator first, iterator last)
@@ -437,17 +436,17 @@ class map
 
 		/*
 		** Swap content
-		** Exchanges the content of the container by the content of x, which is another map of the same type. Sizes may differ.
+		** Exchanges the content of the container by the content of x, which is another Map of the same type. Sizes may differ.
 		** After the call to this member function, the elements in this container are those which
 		** were in x before the call, and the elements of x are those which were in this.
 		** All iterators, references and pointers remain valid for the swapped objects.
 		** Notice that a non-member function exists with the same name, swap,
 		** overloading that algorithm with an optimization that behaves like this member function.
-		** @param x Another map container of the same type as this
+		** @param x Another Map container of the same type as this
 		*/
-		void swap (map& x)
+		void swap (Map& x)
 		{
-			map tmp;
+			Map tmp;
 
 			tmp = (*this);
 			(*this) = x;
@@ -455,7 +454,7 @@ class map
 		}
 
 		/*
-		** Removes all elements from the map container (which are destroyed), leaving the container with a size of 0.
+		** Removes all elements from the Map container (which are destroyed), leaving the container with a size of 0.
 		** @param void void
 		** @return void
 		*/
@@ -470,8 +469,8 @@ class map
 		/*
 		** Return key comparison object
 		** Returns a copy of the comparison object used by the container to compare keys.
-		** The comparison object of a map object is set on construction. Its type
-		** (member key_compare) is the third template parameter of the map template. By default,
+		** The comparison object of a Map object is set on construction. Its type
+		** (member key_compare) is the third template parameter of the Map template. By default,
 		** this is a less object, which returns the same as operator<.
 		** This object determines the order of the elements in the container:
 		** it is a function pointer or a function object that takes two arguments of the same
@@ -492,8 +491,8 @@ class map
 		** Returns a comparison object that can be used to compare two
 		** elements to get whether the key of the first one goes before the second.
 		** The arguments taken by this function object are of member type value_type
-		** (defined in map as an alias of pair<const key_type,mapped_type>),
-		** but the mapped_type part of the value is not taken into consideration in this comparison.
+		** (defined in Map as an alias of pair<const key_type,Mapped_type>),
+		** but the Mapped_type part of the value is not taken into consideration in this comparison.
 		** @param void void
 		** @return The comparison object for element values.
 		*/
@@ -508,12 +507,12 @@ class map
 		/*
 		** Get iterator to element
 		** Searches the container for an element with a key equivalent to k and returns an iterator
-		** to it if found, otherwise it returns an iterator to map::end.
+		** to it if found, otherwise it returns an iterator to Map::end.
 		** Two keys are considered equivalent if the container's comparison
 		** object returns false reflexively (i.e., no matter the order in which the elements are passed as arguments).
-		** Another member function, map::count, can be used to just check whether a particular key exists.
+		** Another member function, Map::count, can be used to just check whether a particular key exists.
 		** @param k Key to be searched for.
-		** @return An iterator to the element, if an element with specified key is found, or map::end otherwise.
+		** @return An iterator to the element, if an element with specified key is found, or Map::end otherwise.
 		*/
 		iterator find (const key_type& k)
 		{
@@ -526,12 +525,12 @@ class map
 		/*
 		** Get iterator to element
 		** Searches the container for an element with a key equivalent to k and returns an iterator
-		** to it if found, otherwise it returns an iterator to map::end.
+		** to it if found, otherwise it returns an iterator to Map::end.
 		** Two keys are considered equivalent if the container's comparison
 		** object returns false reflexively (i.e., no matter the order in which the elements are passed as arguments).
-		** Another member function, map::count, can be used to just check whether a particular key exists.
+		** Another member function, Map::count, can be used to just check whether a particular key exists.
 		** @param k Key to be searched for.
-		** @return An iterator to the element, if an element with specified key is found, or map::end otherwise.
+		** @return An iterator to the element, if an element with specified key is found, or Map::end otherwise.
 		*/
 		const_iterator find (const key_type& k) const
 		{
@@ -544,7 +543,7 @@ class map
 		/*
 		** Count elements with a specific key
 		** Searches the container for elements with a key equivalent to k and returns the number of matches.
-		** Because all elements in a map container are unique,
+		** Because all elements in a Map container are unique,
 		** the function can only return 1 (if the element is found) or zero (otherwise).
 		** Two keys are considered equivalent if the container's comparison
 		** object returns false reflexively (i.e., no matter the order in which the keys are passed as arguments).
@@ -562,10 +561,10 @@ class map
 		** key is not considered to go before k (i.e., either it is equivalent or goes after).
 		** The function uses its internal comparison object (key_comp) to determine this,
 		** returning an iterator to the first element for which key_comp(element_key,k) would return false.
-		** If the map class is instantiated with the default comparison type (less),
+		** If the Map class is instantiated with the default comparison type (less),
 		** the function returns an iterator to the first element whose key is not less than k.
 		** A similar member function, upper_bound, has the same behavior as lower_bound,
-		** except in the case that the map contains an element with a key equivalent to k:
+		** except in the case that the Map contains an element with a key equivalent to k:
 		** In this case, lower_bound returns an iterator pointing to that element,
 		** whereas upper_bound returns an iterator pointing to the next element.
 		** @param k Key to search for.
@@ -585,10 +584,10 @@ class map
 		** key is not considered to go before k (i.e., either it is equivalent or goes after).
 		** The function uses its internal comparison object (key_comp) to determine this,
 		** returning an iterator to the first element for which key_comp(element_key,k) would return false.
-		** If the map class is instantiated with the default comparison type (less),
+		** If the Map class is instantiated with the default comparison type (less),
 		** the function returns an iterator to the first element whose key is not less than k.
 		** A similar member function, upper_bound, has the same behavior as lower_bound,
-		** except in the case that the map contains an element with a key equivalent to k:
+		** except in the case that the Map contains an element with a key equivalent to k:
 		** In this case, lower_bound returns an iterator pointing to that element,
 		** whereas upper_bound returns an iterator pointing to the next element.
 		** @param k Key to search for.
@@ -607,14 +606,14 @@ class map
 		** Returns an iterator pointing to the first element in the container whose key is considered to go after k.
 		** The function uses its internal comparison object (key_comp) to determine this,
 		** returning an iterator to the first element for which key_comp(k,element_key) would return true.
-		** If the map class is instantiated with the default comparison type (less),
+		** If the Map class is instantiated with the default comparison type (less),
 		** the function returns an iterator to the first element whose key is greater than k.
 		** A similar member function, lower_bound, has the same behavior as upper_bound,
-		** except in the case that the map contains an element with a key equivalent
+		** except in the case that the Map contains an element with a key equivalent
 		** to k: In this case lower_bound returns an iterator pointing to that element,
 		** whereas upper_bound returns an iterator pointing to the next element.
 		** @paragm k Key to search for.
-		** @return An iterator to the the first element in the container whose key is considered to go after k, or map::end if no keys are considered to go after k.
+		** @return An iterator to the the first element in the container whose key is considered to go after k, or Map::end if no keys are considered to go after k.
 		*/
 		iterator upper_bound (const key_type& k)
 		{
@@ -629,14 +628,14 @@ class map
 		** Returns an iterator pointing to the first element in the container whose key is considered to go after k.
 		** The function uses its internal comparison object (key_comp) to determine this,
 		** returning an iterator to the first element for which key_comp(k,element_key) would return true.
-		** If the map class is instantiated with the default comparison type (less),
+		** If the Map class is instantiated with the default comparison type (less),
 		** the function returns an iterator to the first element whose key is greater than k.
 		** A similar member function, lower_bound, has the same behavior as upper_bound,
-		** except in the case that the map contains an element with a key equivalent
+		** except in the case that the Map contains an element with a key equivalent
 		** to k: In this case lower_bound returns an iterator pointing to that element,
 		** whereas upper_bound returns an iterator pointing to the next element.
 		** @paragm k Key to search for.
-		** @return An iterator to the the first element in the container whose key is considered to go after k, or map::end if no keys are considered to go after k.
+		** @return An iterator to the the first element in the container whose key is considered to go after k, or Map::end if no keys are considered to go after k.
 		*/
 		const_iterator upper_bound (const key_type& k) const
 		{
@@ -649,7 +648,7 @@ class map
 		/*
 		** Get range of equal elements
 		** Returns the bounds of a range that includes all the elements in the container which have a key equivalent to k.
-		** Because the elements in a map container have unique keys,
+		** Because the elements in a Map container have unique keys,
 		** the range returned will contain a single element at most.
 		** If no matches are found, the range returned has a length of zero,
 		** with both iterators pointing to the first element that has a key
@@ -667,7 +666,7 @@ class map
 		/*
 		** Get range of equal elements
 		** Returns the bounds of a range that includes all the elements in the container which have a key equivalent to k.
-		** Because the elements in a map container have unique keys,
+		** Because the elements in a Map container have unique keys,
 		** the range returned will contain a single element at most.
 		** If no matches are found, the range returned has a length of zero,
 		** with both iterators pointing to the first element that has a key
@@ -685,7 +684,7 @@ class map
 		/* ==== ALLOCATOR ==== */
 		/* =================== */
 		/*
-		** Returns a copy of the allocator object associated with the map.
+		** Returns a copy of the allocator object associated with the Map.
 		** @param void void
 		** @return The allocator.
 		*/
@@ -696,7 +695,7 @@ class map
 
 	/* ============================== MEMBER FUNCTIONS ============================== */
 	public:
-		map& operator= (const map& x)
+		Map& operator= (const Map& x)
 		{
 			this->_alloc = x._alloc;
 			this->_key_comp = x._key_comp;
