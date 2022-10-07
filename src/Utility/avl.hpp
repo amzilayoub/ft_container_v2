@@ -429,6 +429,22 @@ namespace ft
 			}
 
 			/*
+			** Deallocate node
+			** @param node node to be deallocated
+			** @return NULL
+			*/
+			node *deallocate_node(node *root)
+			{
+				this->_alloc.destroy(root->value);
+				this->_alloc.deallocate(root->value, 1);
+				this->_alloc_node.destroy(root);
+				this->_alloc_node.deallocate(root, 1);
+				root = NULL;
+
+				return (root);
+			}
+
+			/*
 			** Delete a noce
 			** @param key targeted key
 			** @return returning the tree after deleting the targeted key
@@ -459,39 +475,36 @@ namespace ft
 				*/
 				if (root->is_equal(key))
 				{
+					
 					node *tmp;
 
 					tmp = NULL;
-					/*
-					** At least there's a child, left or right
-					*/
-					if (root->left || root->right)
+					if (root->right == NULL || root->left == NULL)
+					{
+						tmp = (root->left) ? root->left : root->right;
+						if (tmp == NULL)
+						{
+							tmp = root;
+							root = NULL;
+						}
+						else
+						{
+							root->right = tmp->right;
+							root->left = tmp->left;
+							root->value = tmp->value;
+							// Here we should free the value attribite
+						}
+						this->_alloc_node.deallocate(tmp, 1);
+					}
+					else
 					{
 						tmp = root->right->minimum_node();
-						if (tmp == root->right)
-							tmp->parent->right = NULL;
-						else
-							tmp->parent->left = NULL;
-						if (root->right)
-							root->right->parent = tmp;
-						if (root->left)
-							root->left->parent = tmp;
 
-						tmp->parent = root->parent;
-						tmp->left = root->left;
-						tmp->right = root->right;
-						/*
-						** Normally, we should connect the parent to the new node (tmp),
-						** but since we are calling the functions in recursive way, the parent left or right,
-						** will be replaced manually by one the next if else block
-						** which is root->right = this->delete_node(...) or root->left = ...
-						*/
+						root->value = tmp->value;
+						// this->_alloc.destroy(root->value);
+						// this->_alloc.construct(root->value, *(tmp->value));
+						root->right = this->delete_node(root->right, tmp->get_key());
 					}
-					this->_alloc.destroy(root->value);
-					this->_alloc.deallocate(root->value, 1);
-					this->_alloc_node.deallocate(root, 1);
-
-					root = tmp;
 				}
 				/*
 				** Search on the right
