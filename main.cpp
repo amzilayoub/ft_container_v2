@@ -16,17 +16,25 @@
 #include <iostream>
 #include <map>
 
+# define SETW(x) "|"
 
 using namespace std;
 int main ()
 {
-  ft::Map<int, char> my_m;
-	for (int i = 0; i < 1e2; i++)
-		my_m.insert(ft::make_pair(i, 'A'));
+	time_t start, end, diff;
 
-	ft::Map<int, char>::reverse_iterator my_rit2(my_m.end());
-	ft::Map<int, char>::const_reverse_iterator c_it, c_ob(my_m.end());
-	c_it = my_rit2;
-	std::cout << (*(*my_rit2)).first << std::endl;
-	// EQUAL(my_rit2->first == c_it->first && my_rit2->first == c_ob->first);
+	std::map<int, std::string> m;
+	ft::Map<int, std::string> ft_m;
+	for (size_t i = 0; i < 1e6; ++i)
+	{
+		m.insert(std::make_pair(i, "value"));
+		ft_m.insert(ft::make_pair(i, "value"));
+	}
+	for (std::map<int, std::string>::iterator it = m.begin(); it != m.end(); ++it)
+		;
+	diff = end - start;
+	diff = (diff) ? (diff * TIME_FAC) : TIME_FAC;
+
+	for (ft::Map<int, std::string>::iterator it = ft_m.begin(); it != ft_m.end(); ++it)
+		;
 }

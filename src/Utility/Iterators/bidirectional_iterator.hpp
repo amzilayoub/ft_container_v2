@@ -14,7 +14,7 @@
 namespace ft
 {
 
-template<typename T>
+template<typename Node, typename T>
 class bidirectional_iterator : public ft::iterator_traits<ft::iterator<std::bidirectional_iterator_tag, T> >
 {
 	/* ============================== MEMBER TYPE ============================== */
@@ -27,21 +27,14 @@ class bidirectional_iterator : public ft::iterator_traits<ft::iterator<std::bidi
         typedef typename ft::iterator_traits<ft::iterator<std::bidirectional_iterator_tag, T> >::pointer			pointer;
         typedef typename ft::iterator_traits<ft::iterator<std::bidirectional_iterator_tag, T> >::reference			reference;
         typedef typename ft::iterator_traits<ft::iterator<std::bidirectional_iterator_tag, T> >::iterator_category	iterator_category;
-		
-		/*
-		** Defining member type for return value of the node object (AKA: pair<key, value>)
-		*/
-		typedef typename T::value_type																				pair_value_type;
-		typedef typename T::value_type																				&ref_pair_type;
-		typedef typename T::value_type																				*pointer_pair_type;
-	
+
 	/* ============================== MEMBER ATTRIBUTES ============================== */
 	private:
-		value_type	*_iter;
+		Node	*_iter;
 
 	/* ============================== CONSTRUCTOR/DESTRUCTORS ============================== */
 	public:
-		bidirectional_iterator(pointer ptr = NULL) : _iter(ptr)
+		bidirectional_iterator(Node *ptr = NULL) : _iter(ptr)
 		{
 		}
 
@@ -49,9 +42,9 @@ class bidirectional_iterator : public ft::iterator_traits<ft::iterator<std::bidi
 		{
 		}
 
-		operator bidirectional_iterator<const value_type>()
+		operator bidirectional_iterator<Node, const value_type>()
 		{
-			return (bidirectional_iterator<const value_type>(this->_iter));
+			return (bidirectional_iterator<Node, const value_type>(this->_iter));
 		}
 
 		value_type *base()
@@ -71,12 +64,12 @@ class bidirectional_iterator : public ft::iterator_traits<ft::iterator<std::bidi
 			return (this->_iter != rhs._iter);
 		}
 
-		ref_pair_type	operator*() const
+		reference	operator*() const
 		{
 			return (this->_iter->operator*());
 		}
 		
-		pointer_pair_type	operator->() const
+		pointer	operator->() const
 		{
 			return &(this->operator*());
 		}

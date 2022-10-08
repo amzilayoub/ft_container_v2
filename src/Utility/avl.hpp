@@ -414,8 +414,6 @@ namespace ft
 			*/
 			node *insert(node *root, node *parent, value_type const value)
 			{
-				int balance;
-
 				if (!root)
 					root = this->create_node(value, parent);
 				else if (this->_compare(root->value->first, value.first))
@@ -532,7 +530,7 @@ namespace ft
 			** @param key the needle
 			** @return return the node that contains that key, otherwise NULL
 			*/
-			node *search(key_type key)
+			node *search(key_type key) const
 			{
 				return (this->search(this->root, key));
 			}
@@ -543,7 +541,7 @@ namespace ft
 			** @param key the needle
 			** @return return the node that contains that key, otherwise NULL
 			*/
-			node *search(node *root, key_type key)
+			node *search(node *root, key_type key) const
 			{
 				if (root == NULL)
 					return (root);
@@ -561,7 +559,7 @@ namespace ft
 			** @param key the needle
 			** @return return the lower bound, otherwise NULL
 			*/
-			node *lower_bound(node *root, key_type const &key)
+			node *lower_bound(node *root, key_type const &key) const
 			{
 				node *tmp;
 
@@ -588,7 +586,7 @@ namespace ft
 			** @param key the needle
 			** @return return the lower bound, otherwise NULL
 			*/
-			node *lower_bound(key_type const &key)
+			node *lower_bound(key_type const &key) const
 			{
 				return (this->lower_bound(this->root, key));
 			}
@@ -599,7 +597,7 @@ namespace ft
 			** @param key the needle
 			** @return return the upper bound, otherwise NULL
 			*/
-			node *upper_bound(node *root, key_type const &key)
+			node *upper_bound(node *root, key_type const &key) const
 			{
 				node *tmp;
 
@@ -626,7 +624,7 @@ namespace ft
 			** @param key the needle
 			** @return return the upper bound, otherwise NULL
 			*/
-			node *upper_bound(key_type const &key)
+			node *upper_bound(key_type const &key) const
 			{
 				return (this->upper_bound(this->root, key));
 			}

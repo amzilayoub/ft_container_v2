@@ -23,6 +23,7 @@
 # include "../Utility/Iterators/iterator_traits.hpp"
 # include "../Utility/Iterators/bidirectional_iterator.hpp"
 # include "../Utility/Iterators/reverse_iterator.hpp"
+# include "./vector.hpp"
 # include <functional>
 
 namespace ft
@@ -38,6 +39,7 @@ class Map
 	/* ============================== MEMBER TYPE ============================== */
 	private:
 		typedef typename	ft::AVL<Key, T, Compare, Alloc>::node				node;
+		typedef typename	ft::AVL<Key, const T, Compare, Alloc>::node			const_node;
 
 	public:
 		typedef				Key													key_type;
@@ -49,8 +51,8 @@ class Map
 		typedef typename	allocator_type::const_reference						const_reference;
 		typedef typename	allocator_type::pointer								pointer;
 		typedef typename	allocator_type::const_pointer						const_pointer;
-		typedef typename	ft::bidirectional_iterator<node>					iterator;
-		typedef typename	ft::bidirectional_iterator<const node>				const_iterator;
+		typedef typename	ft::bidirectional_iterator<node, value_type>		iterator;
+		typedef typename	ft::bidirectional_iterator<node, const value_type>	const_iterator;
 		typedef typename	ft::reverse_iterator<iterator>						reverse_iterator;
 		typedef typename	ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 		typedef typename	ft::iterator_traits<iterator>::difference_type		difference_type;
@@ -309,7 +311,7 @@ class Map
 		*/
 		Mapped_type& operator[] (const key_type& k)
 		{
-			return ((*((this->insert(make_pair(k, Mapped_type()))).first)).second);
+			return ((*((this->insert(ft::make_pair(k, Mapped_type()))).first)).second);
 		}
 
 		/* =================== */
@@ -705,7 +707,36 @@ class Map
 			return (*this);
 		}
 	
-	/* ============================== HELPER MEMBER FUNCTIONS ============================== */
+	/* ============================== COMPARAISON FUNCTIONS ============================== */
+	public:
+	    friend bool operator==(const Map &lhs, const Map &rhs)
+		{
+			return (lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+		}
+        friend bool operator!=(const Map& lhs, const Map& rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+        friend bool operator<(const Map& lhs,const Map& rhs)
+		{
+			return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+		}
+
+        friend bool operator<=(const Map& lhs,const Map& rhs)
+		{
+			return !(rhs < lhs);
+		}
+
+        friend bool operator>(const Map& lhs, const Map& rhs )
+		{
+			return (rhs < lhs);
+		}
+
+        friend bool operator>=(const Map& lhs,const Map& rhs )
+		{
+			return !(rhs > lhs);
+		}
 };
 
 };
