@@ -705,6 +705,34 @@ namespace ft
 				this->insert(*(rhs->value));
 			}
 
+			/*
+			** Swap 2 instance of the AVL tree
+			** @param x object of the same type as this
+			** @return void
+			*/
+			void swap (AVL& x)
+			{
+				AVL tmp;
+
+				tmp.root = this->root;
+				tmp.root_parent = this->root_parent;
+				tmp._alloc = this->_alloc;
+				tmp._alloc_node = this->_alloc_node;
+				tmp._compare = this->_compare;
+				
+				this->root = x.root;
+				this->root_parent = x.root_parent;
+				this->_alloc = x._alloc;
+				this->_alloc_node = x._alloc_node;
+				this->_compare = x._compare;
+				
+				x.root = tmp.root;
+				x.root_parent = tmp.root_parent;
+				x._alloc = tmp._alloc;
+				x._alloc_node = tmp._alloc_node;
+				x._compare = tmp._compare;
+			}
+
 			AVL& operator= (const AVL& rhs)
 			{
 				this->clear();

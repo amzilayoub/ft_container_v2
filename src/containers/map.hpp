@@ -448,12 +448,10 @@ class Map
 		*/
 		void swap (Map& x)
 		{
-			Map *tmp;
-
-			tmp->_alloc = x._alloc;
-			tmp->_key_comp = x._key_comp;
-			tmp->_size = x._size;
-			tmp->_tree = x._tree
+			std::swap(this->_alloc, x._alloc);
+			std::swap(this->_key_comp, x._key_comp);
+			std::swap(this->_size, x._size);
+			this->_tree.swap(x._tree);
 		}
 
 		/*
@@ -740,4 +738,9 @@ class Map
 		}
 };
 
+template <class Key, class T, class Compare, class Alloc>
+void swap (Map<Key,T,Compare,Alloc>& x, Map<Key,T,Compare,Alloc>& y)
+{
+	x.swap(y);
+}
 };
