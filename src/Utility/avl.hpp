@@ -187,15 +187,15 @@ namespace ft
 				{
 					size_type height;
 
-					if (!root || root->height == 0)
+					if (!root)
 						return ;
 
 					height = 0;
 					if (root->left)
 						height = root->left->height;
-					else if (root->right)
+					if (root->right)
 						height = std::max(root->right->height, height);
-					
+
 					root->height = height + 1;
 				}
 
@@ -374,7 +374,7 @@ namespace ft
 						root = root->left_rotation();
 					}						
 				}
-			return (root);
+				return (root);
 			}
 
 			/*
@@ -415,14 +415,14 @@ namespace ft
 			node *insert(node *root, node *parent, value_type const value)
 			{
 				if (!root)
-					root = this->create_node(value, parent);
+					return (this->create_node(value, parent));
 				else if (this->_compare(root->value->first, value.first))
 					root->right = this->insert(root->right, root, value);
 				else
 					root->left = this->insert(root->left, root, value);
 
-				root = this->balance_tree(root);
 				root->update_height();
+				root = this->balance_tree(root);
 				return (root);
 			}
 

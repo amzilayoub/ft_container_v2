@@ -21,20 +21,40 @@
 using namespace std;
 int main ()
 {
-	time_t start, end, diff;
+{
+        /*---------------------------------- time limit test --------------------------------------------*/
+        {
+            time_t start, end, diff;
+            std::map<int, char> m;
+            ft::Map<int, char> my_m;
 
-	std::map<int, std::string> m;
-	ft::Map<int, std::string> ft_m;
-	for (size_t i = 0; i < 1e6; ++i)
-	{
-		m.insert(std::make_pair(i, "value"));
-		ft_m.insert(ft::make_pair(i, "value"));
-	}
-	for (std::map<int, std::string>::iterator it = m.begin(); it != m.end(); ++it)
-		;
-	diff = end - start;
-	diff = (diff) ? (diff * TIME_FAC) : TIME_FAC;
+            for (size_t i = 0; i < 1e3; i++)
+            {
+                m.insert(std::make_pair(i, 'X'));
+                my_m.insert(ft::make_pair(i, 'X'));
+            }
 
-	for (ft::Map<int, std::string>::iterator it = ft_m.begin(); it != ft_m.end(); ++it)
-		;
+            std::map<int, char> copy_m(m);
+            diff = end - start;
+            diff = (diff) ? (diff * 20) : 20;
+
+            ft::Map<int, char> my_copy_m(my_m);
+        }
+        /*---------------------------------------------------------------------------------------------*/
+        /*---------------------------- declare a vector and fill with 'a', and create a copy of it ------------------*/
+        ft::Map<int, char> m1;
+        for (int i = 0; i < 10; i++)
+            m1.insert(ft::make_pair(i, 'a'));
+        ft::Map<int, char> copy_m(m1);
+        /*-----------------------------------------------------------------------------------------------------------*/
+        /*--------------- declare tow strings to store the results ------*/
+        std::string res, res1;
+        /*--------------------------------------------------------*/
+        for (ft::Map<int, char>::iterator it = m1.begin(); it != m1.end(); ++it) // fill res from m1
+            res += it->second;
+
+        for (ft::Map<int, char>::iterator it = copy_m.begin(); it != copy_m.end(); ++it) // fill res from copy_m
+            res1 += it->second;
+        EQUAL(res == res1);
+    }
 }
