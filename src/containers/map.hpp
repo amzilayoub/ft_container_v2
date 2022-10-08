@@ -125,6 +125,14 @@ class Map
 		{
 			(*this) = x;
 		}
+
+		/*
+		** Destructor
+		*/
+		~Map (void)
+		{
+			this->_tree.clear(true);
+		}
 		
 	/* ============================== MEMBER FUNCTIONS ============================== */
 	public:

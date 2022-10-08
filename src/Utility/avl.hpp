@@ -301,8 +301,6 @@ namespace ft
 
 			~AVL()
 			{
-				// this->_alloc.destroy(this->_root);
-				// this->_alloc.deallocate(this->value, 1);
 			}
 
 		/* ============================== MEMBER FUNCTION ============================== */
@@ -681,12 +679,16 @@ namespace ft
 
 			/*
 			** take a node and clear all the subtree
-			** @param void void
+			** @param clear_parent boolean indicate wheter to clear the parent as well or not
 			** @return void
 			*/
-			void clear()
+			void clear(bool clear_parent = false)
 			{
 				this->root = this->clear(this->root);
+
+				this->root_parent->left = this->root;
+				if (clear_parent)
+					this->_alloc_node.deallocate(this->root_parent, 1);
 			}
 
 			/*
