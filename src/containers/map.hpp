@@ -448,11 +448,12 @@ class Map
 		*/
 		void swap (Map& x)
 		{
-			Map tmp;
+			Map *tmp;
 
-			tmp = (*this);
-			(*this) = x;
-			x = tmp;
+			tmp->_alloc = x._alloc;
+			tmp->_key_comp = x._key_comp;
+			tmp->_size = x._size;
+			tmp->_tree = x._tree
 		}
 
 		/*

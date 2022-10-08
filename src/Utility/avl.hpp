@@ -416,6 +416,8 @@ namespace ft
 			{
 				if (!root)
 					return (this->create_node(value, parent));
+				if (root->is_equal(value.first))
+					return (root);
 				else if (this->_compare(root->value->first, value.first))
 					root->right = this->insert(root->right, root, value);
 				else
@@ -663,6 +665,8 @@ namespace ft
 			*/
 			node *clear(node *root)
 			{
+				if (!root)
+					return (root);
 				if (root->left)
 					root->left = this->clear(root->left);
 				if (root->right)
@@ -692,6 +696,8 @@ namespace ft
 			*/
 			void copy_tree(const node *rhs)
 			{
+				if (!rhs)
+					return ;
 				if (rhs->right)
 					this->copy_tree(rhs->right);
 				if (rhs->left)

@@ -18,43 +18,105 @@
 
 # define SETW(x) "|"
 
+template <typename Iter1, typename Iter2>
+bool compareMaps(Iter1 first1, Iter1 last1, Iter2 first2, Iter2 last2)
+{
+    for (; (first1 != last1) && (first2 != last2); ++first1, ++first2)
+        if (first1->first != first2->first || first1->second != first2->second)
+            return false;
+    return true;
+}
+
 using namespace std;
 int main ()
 {
 {
-        /*---------------------------------- time limit test --------------------------------------------*/
-        {
-            time_t start, end, diff;
-            std::map<int, char> m;
-            ft::Map<int, char> my_m;
+        bool cond(false);
+        // {
+        //     time_t start, end, diff;
+        //     /*------------------ std::maps ---------------------*/
+        //     std::map<int, std::string> m1;
+        //     ft::Map<int, std::string> ft_m1;
 
-            for (size_t i = 0; i < 1e3; i++)
-            {
-                m.insert(std::make_pair(i, 'X'));
-                my_m.insert(ft::make_pair(i, 'X'));
-            }
+        //     for (size_t i = 0; i < 1e6; i++)
+        //         m1.insert(std::make_pair(i, "string2"));
+        //     diff = end - start;
+        //     diff = (diff) ? (diff * TIME_FAC) : TIME_FAC;
+        //     /*-----------------------------------------------------*/
+        //     /*------------------ ft::Maps ---------------------*/
+        //     for (size_t i = 0; i < 1e6; i++)
+        //         ft_m1.insert(ft::make_pair(i, "string2"));
 
-            std::map<int, char> copy_m(m);
-            diff = end - start;
-            diff = (diff) ? (diff * 20) : 20;
+        //     /*----------------------------------------------------*/
+        //     /*------------------ std::maps ---------------------*/
+        //     std::map<int, std::string> m_range;
+        //     ft::Map<int, std::string> ft_m_range;
 
-            ft::Map<int, char> my_copy_m(my_m);
-        }
-        /*---------------------------------------------------------------------------------------------*/
-        /*---------------------------- declare a vector and fill with 'a', and create a copy of it ------------------*/
-        ft::Map<int, char> m1;
-        for (int i = 0; i < 10; i++)
-            m1.insert(ft::make_pair(i, 'a'));
-        ft::Map<int, char> copy_m(m1);
-        /*-----------------------------------------------------------------------------------------------------------*/
-        /*--------------- declare tow strings to store the results ------*/
-        std::string res, res1;
-        /*--------------------------------------------------------*/
-        for (ft::Map<int, char>::iterator it = m1.begin(); it != m1.end(); ++it) // fill res from m1
-            res += it->second;
+        //     m_range.insert(m1.begin(), m1.end());
+        //     diff = end - start;
+        //     diff = (diff) ? (diff * TIME_FAC) : TIME_FAC;
+        //     /*-----------------------------------------------------*/
+        //     /*------------------ ft::Maps ---------------------*/
+        //     ft_m_range.insert(ft_m1.begin(), ft_m1.end());
+        //     /*----------------------------------------------------*/
+        // }
 
-        for (ft::Map<int, char>::iterator it = copy_m.begin(); it != copy_m.end(); ++it) // fill res from copy_m
-            res1 += it->second;
-        EQUAL(res == res1);
+        // {
+        //     time_t start, end, diff;
+        //     /*------------------ std::maps ---------------------*/
+        //     std::map<int, std::string> m1;
+        //     ft::Map<int, std::string> ft_m1;
+
+        //     m1.insert(std::make_pair(1e9, "string2"));
+        //     diff = end - start;
+        //     diff = (diff) ? (diff * TIME_FAC) : TIME_FAC;
+        //     /*-----------------------------------------------------*/
+        //     /*------------------ ft::Maps ---------------------*/
+        //     ft_m1.insert(ft::make_pair(1e9, "string2"));
+        //     /*----------------------------------------------------*/
+        // }
+
+        std::map<char, int> m;
+        ft::Map<char, int> ft_m;
+
+        cond = m.size() == ft_m.size() && m.empty() == ft_m.empty();
+
+        // first insert function version (single parameter):
+        m.insert(std::pair<char, int>('a', 100));
+        m.insert(std::pair<char, int>('z', 200));
+
+        ft_m.insert(ft::pair<char, int>('a', 100));
+        ft_m.insert(ft::pair<char, int>('z', 200));
+
+        cond = cond && (m.size() == ft_m.size() && m.empty() == ft_m.empty());
+
+        std::pair<std::map<char, int>::iterator, bool> ret;
+        ft::pair<ft::Map<char, int>::iterator, bool> ft_ret;
+
+        ret = m.insert(std::pair<char, int>('z', 500));
+        ft_ret = ft_m.insert(ft::pair<char, int>('z', 500));
+
+        cond = cond && ret.second == ft_ret.second;
+
+        // second insert function version (with hint position):
+        std::map<char, int>::iterator it = m.begin();
+        ft::Map<char, int>::iterator ft_it = ft_m.begin();
+        m.insert(it, std::pair<char, int>('b', 300));
+        m.insert(it, std::pair<char, int>('c', 400));
+
+        ft_m.insert(ft_it, ft::pair<char, int>('b', 300));
+        ft_m.insert(ft_it, ft::pair<char, int>('c', 400));
+
+        cond = cond && (m.size() == ft_m.size() && m.empty() == ft_m.empty());
+
+        // third insert function version (range insertion):
+        std::map<char, int> anothermap;
+        ft::Map<char, int> ft_anothermap;
+        anothermap.insert(m.begin(), m.find('c'));
+        ft_anothermap.insert(ft_m.begin(), ft_m.find('c'));
+        cond = cond && (anothermap.size() == ft_anothermap.size() && anothermap.empty() == ft_anothermap.empty());
+
+        cond = cond && compareMaps(ft_m.begin(), ft_m.end(), m.begin(), m.end()) && compareMaps(ft_anothermap.begin(), ft_anothermap.end(), anothermap.begin(), anothermap.end());
+        EQUAL(cond);
     }
 }
