@@ -79,7 +79,7 @@ class Map
 		};
 
 	/* ============================== MEMBER ATTRIBUTES ============================== */
-	public:
+	private:
 		ft::AVL<Key, T, Compare, Alloc>	_tree;
 		key_compare						_key_comp;
 		allocator_type					_alloc;
